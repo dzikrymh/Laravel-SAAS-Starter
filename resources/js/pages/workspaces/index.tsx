@@ -42,7 +42,7 @@ export default function WorkspacesIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('workspace.list.title', 'Workspaces')} />
 
-            <div className="space-y-6">
+            <div className="space-y-6 p-4">
                 <div className="flex items-center justify-between">
                     <Heading
                         title={t('workspace.list.title', 'Workspaces')}
