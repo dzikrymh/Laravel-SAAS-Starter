@@ -152,7 +152,9 @@ it('returns recommendations for missing security features', function () {
 
     $response->assertJsonCount(2, 'recommendations');
     $response->assertJsonPath('recommendations.0.priority', 'high');
+    $response->assertJsonPath('recommendations.0.action', '/settings/security/authentication#two-factor');
     $response->assertJsonPath('recommendations.1.priority', 'high');
+    $response->assertJsonPath('recommendations.1.action', '/settings/security/authentication#password');
 });
 
 it('returns recommendation to enable 2fa when disabled', function () {

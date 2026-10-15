@@ -36,12 +36,14 @@ interface PasswordHistoryEntry {
 
 interface AuthenticationProps {
     passwordHistory: PasswordHistoryEntry[];
+    hasPassword: boolean;
     twoFactorEnabled: boolean;
     requiresConfirmation: boolean;
 }
 
 export default function Authentication({
     passwordHistory,
+    hasPassword,
     twoFactorEnabled,
     requiresConfirmation,
 }: AuthenticationProps) {
@@ -94,13 +96,15 @@ export default function Authentication({
             >
                 <div className="space-y-8">
                     {/* Security Summary */}
-                    <SecuritySummaryCard />
+                    <SecuritySummaryCard
+                        key={`${hasPassword}-${twoFactorEnabled}`}
+                    />
 
                     {/* Session Summary */}
                     <SessionSummaryCard />
 
                     {/* Password Section */}
-                    <Card>
+                    <Card id="password" className="scroll-mt-16">
                         <CardHeader>
                             <div className="flex items-center gap-2">
                                 <Key className="h-5 w-5 text-muted-foreground" />
@@ -120,34 +124,37 @@ export default function Authentication({
                                 onSubmit={submitPassword}
                                 className="space-y-4"
                             >
-                                <div className="grid gap-2">
-                                    <Label htmlFor="current_password">
-                                        {t(
-                                            'settings.password.current_password',
-                                            'Current password',
-                                        )}
-                                    </Label>
-                                    <Input
-                                        id="current_password"
-                                        type="password"
-                                        value={
-                                            passwordInput.data.current_password
-                                        }
-                                        onChange={(e) =>
-                                            passwordInput.setData(
-                                                'current_password',
-                                                e.target.value,
-                                            )
-                                        }
-                                        autoComplete="current-password"
-                                    />
-                                    <InputError
-                                        message={
-                                            passwordInput.errors
-                                                .current_password
-                                        }
-                                    />
-                                </div>
+                                {hasPassword && (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="current_password">
+                                            {t(
+                                                'settings.password.current_password',
+                                                'Current password',
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="current_password"
+                                            type="password"
+                                            value={
+                                                passwordInput.data
+                                                    .current_password
+                                            }
+                                            onChange={(e) =>
+                                                passwordInput.setData(
+                                                    'current_password',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            autoComplete="current-password"
+                                        />
+                                        <InputError
+                                            message={
+                                                passwordInput.errors
+                                                    .current_password
+                                            }
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">
@@ -287,7 +294,7 @@ export default function Authentication({
                     </Card>
 
                     {/* Two-Factor Authentication Section */}
-                    <Card>
+                    <Card id="two-factor" className="scroll-mt-16">
                         <CardHeader>
                             <div className="flex items-center gap-2">
                                 <Lock className="h-5 w-5 text-muted-foreground" />

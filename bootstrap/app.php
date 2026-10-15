@@ -13,6 +13,7 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\RequestId;
+use App\Http\Middleware\RequirePasswordUnlessPasswordless;
 use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrackLastSeen;
@@ -70,6 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'workspace.suspended' => EnsureWorkspaceNotSuspended::class,
             'onboarded' => EnsureUserIsOnboarded::class,
             'require2fa' => RequireTwoFactor::class,
+            'password.confirm' => RequirePasswordUnlessPasswordless::class,
             'api-key' => AuthenticateApiKey::class,
         ]);
     })

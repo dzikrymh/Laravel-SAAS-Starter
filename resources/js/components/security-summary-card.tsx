@@ -11,6 +11,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Spinner } from '@/components/ui/spinner';
 import { useDateFormatter } from '@/hooks/use-date-formatter';
+import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
     AlertCircle,
@@ -22,7 +23,12 @@ import {
     Shield,
     XCircle,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+    useEffect,
+    useState,
+    type ComponentProps,
+    type MouseEvent,
+} from 'react';
 
 interface SecuritySummaryData {
     authentication: {
@@ -56,6 +62,38 @@ const ProviderIcons: Record<
     github: Github,
     google: Google,
 };
+
+/**
+ * Smoothly scrolls to the target section when it lives on the current page,
+ * otherwise navigates there with Inertia.
+ */
+function SectionLink({
+    href,
+    onClick,
+    ...props
+}: Omit<ComponentProps<typeof Link>, 'href'> & { href: string }) {
+    const scrollToSection = (event: MouseEvent) => {
+        onClick?.(event);
+
+        const url = new URL(href, window.location.origin);
+
+        if (url.pathname !== window.location.pathname || !url.hash) {
+            return;
+        }
+
+        const section = document.getElementById(url.hash.slice(1));
+
+        if (!section) {
+            return;
+        }
+
+        event.preventDefault();
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.history.replaceState(window.history.state, '', url.hash);
+    };
+
+    return <Link {...props} href={href} onClick={scrollToSection} />;
+}
 
 function getScoreColor(score: number): string {
     if (score >= 80) return 'text-green-600 dark:text-green-400';
@@ -207,7 +245,9 @@ export function SecuritySummaryCard() {
                                 className="mt-1 h-auto p-0"
                                 asChild
                             >
-                                <a href="/settings/password">Set password →</a>
+                                <SectionLink href="/settings/security/authentication#password">
+                                    Set password →
+                                </SectionLink>
                             </Button>
                         )}
                     </div>
@@ -257,7 +297,9 @@ export function SecuritySummaryCard() {
                                 className="mt-1 h-auto p-0"
                                 asChild
                             >
-                                <a href="/settings/two-factor">Enable 2FA →</a>
+                                <SectionLink href="/settings/security/authentication#two-factor">
+                                    Enable 2FA →
+                                </SectionLink>
                             </Button>
                         )}
                     </div>
@@ -310,11 +352,11 @@ export function SecuritySummaryCard() {
                             className="mt-1 h-auto p-0"
                             asChild
                         >
-                            <a href="/settings/connected-accounts">
+                            <SectionLink href="/settings/connected-accounts">
                                 {authentication.social_accounts.length > 0
                                     ? 'Manage connections →'
                                     : 'Connect accounts →'}
-                            </a>
+                            </SectionLink>
                         </Button>
                     </div>
                 </div>
@@ -339,10 +381,10 @@ export function SecuritySummaryCard() {
                                             className="mt-0.5 h-auto p-0"
                                             asChild
                                         >
-                                            <a href={rec.action}>
+                                            <SectionLink href={rec.action}>
                                                 Take action{' '}
                                                 <ArrowRight className="ml-1 h-3 w-3" />
-                                            </a>
+                                            </SectionLink>
                                         </Button>
                                     )}
                                 </div>

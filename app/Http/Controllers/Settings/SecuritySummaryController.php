@@ -86,7 +86,7 @@ class SecuritySummaryController extends Controller
             $recommendations[] = [
                 'text' => 'Enable two-factor authentication for enhanced security',
                 'priority' => 'high',
-                'action' => '/settings/two-factor',
+                'action' => '/settings/security/authentication#two-factor',
             ];
         }
 
@@ -94,7 +94,7 @@ class SecuritySummaryController extends Controller
             $recommendations[] = [
                 'text' => 'Set a password or connect a social account to secure your account',
                 'priority' => 'high',
-                'action' => '/settings/password',
+                'action' => '/settings/security/authentication#password',
             ];
         }
 
