@@ -213,7 +213,6 @@ Route::middleware(['auth', 'verified', 'onboarded', 'workspace', 'require2fa', '
     Route::delete('/workspaces/leave', [WorkspaceController::class, 'leave'])->name('workspaces.leave');
 
     // Connected Social Accounts
-    Route::get('/settings/connected-accounts', [ConnectedAccountController::class, 'index'])->name('connected-accounts.index');
     Route::delete('/settings/connected-accounts/{provider}', [ConnectedAccountController::class, 'destroy'])->name('connected-accounts.destroy');
 
     // Onboarding Checklist
@@ -269,7 +268,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'workspace', 'require2fa', '
 
 // 2FA Enforcement Wall (auth only, no require2fa to avoid infinite redirect)
 Route::middleware(['auth', 'verified', 'onboarded', 'workspace'])->group(function () {
-    Route::get('/workspace/2fa-required', [WorkspaceSecurityController::class, 'twoFactorRequired'])->name('workspace.2fa-required');
+    Route::get('/workspace/2fa-required', [WorkspaceSecurityController::class, 'twoFactorRequired'])->name('workspace.two-factor-required');
 });
 
 // Workspace Suspension Wall
@@ -351,7 +350,7 @@ require __DIR__.'/settings.php';
 // Admin routes
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
     // 2FA Enforcement Wall
-    Route::get('/2fa-required', [SecurityController::class, 'twoFactorRequired'])->name('2fa-required');
+    Route::get('/2fa-required', [SecurityController::class, 'twoFactorRequired'])->name('two-factor-required');
 
     Route::middleware([RequireAdminTwoFactor::class])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

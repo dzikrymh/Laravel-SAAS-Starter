@@ -50,7 +50,7 @@ export default function Notifications({
         processing: testProcessing,
         recentlySuccessful: testRecentlySuccessful,
         errors: testErrors,
-    } = useForm({});
+    } = useForm<{ message?: string }>({});
 
     const sendTestNotification = () => {
         postTest(sendTest.url(), { preserveScroll: true });

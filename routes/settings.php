@@ -87,7 +87,6 @@ Route::middleware('auth')->group(function () {
 
     // Connected Accounts
     Route::get('settings/connected-accounts', [ConnectedAccountController::class, 'index'])->name('connected-accounts.index');
-    Route::delete('settings/connected-accounts/{connectedAccount}', [ConnectedAccountController::class, 'destroy'])->name('connected-accounts.destroy');
 
     // Security Summary
     Route::get('settings/security-summary', SecuritySummaryController::class)->name('security-summary.index');

@@ -35,8 +35,6 @@ import {
     Download,
     Key,
     Palette,
-    Plus,
-    Save,
     Users,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -58,8 +56,6 @@ interface WorkspaceSettingsProps {
         score: number;
         steps: OnboardingStep[];
     };
-    tags?: TagType[];
-    customFields?: CustomField[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -71,8 +67,6 @@ export default function WorkspaceSettings({
     userRole,
     stats,
     onboardingProgress,
-    tags = [],
-    customFields = [],
 }: WorkspaceSettingsProps) {
     const { t } = useTranslations();
     const { data, setData, errors, processing, isDirty } = useForm({

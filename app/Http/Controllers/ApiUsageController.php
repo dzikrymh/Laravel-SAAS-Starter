@@ -48,7 +48,7 @@ class ApiUsageController extends Controller
             ->select(
                 DB::raw('DATE(requested_at) as date'),
                 DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN was_throttled = 1 THEN 1 ELSE 0 END) as throttled'),
+                DB::raw('SUM(CASE WHEN was_throttled THEN 1 ELSE 0 END) as throttled'),
                 DB::raw('SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) as errors'),
             )
             ->groupBy(DB::raw('DATE(requested_at)'))
@@ -64,7 +64,7 @@ class ApiUsageController extends Controller
                 'workspace_api_keys.name',
                 'workspace_api_keys.key_prefix',
                 DB::raw('COUNT(*) as total_requests'),
-                DB::raw('SUM(CASE WHEN was_throttled = 1 THEN 1 ELSE 0 END) as throttled_count'),
+                DB::raw('SUM(CASE WHEN was_throttled THEN 1 ELSE 0 END) as throttled_count'),
                 DB::raw('AVG(response_time_ms) as avg_response_time'),
                 DB::raw('MAX(requested_at) as last_request_at'),
             )
@@ -85,13 +85,13 @@ class ApiUsageController extends Controller
         $statusDistribution = ApiRequestLog::where('workspace_id', $workspace->id)
             ->where('requested_at', '>=', $since)
             ->select(
-                DB::raw('CASE
-                    WHEN status_code >= 200 AND status_code < 300 THEN "2xx"
-                    WHEN status_code >= 300 AND status_code < 400 THEN "3xx"
-                    WHEN status_code >= 400 AND status_code < 500 THEN "4xx"
-                    WHEN status_code >= 500 THEN "5xx"
-                    ELSE "other"
-                END as status_group'),
+                DB::raw("CASE
+                    WHEN status_code >= 200 AND status_code < 300 THEN '2xx'
+                    WHEN status_code >= 300 AND status_code < 400 THEN '3xx'
+                    WHEN status_code >= 400 AND status_code < 500 THEN '4xx'
+                    WHEN status_code >= 500 THEN '5xx'
+                    ELSE 'other'
+                END as status_group"),
                 DB::raw('COUNT(*) as count'),
             )
             ->groupBy('status_group')

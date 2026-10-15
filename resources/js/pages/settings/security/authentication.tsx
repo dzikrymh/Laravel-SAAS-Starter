@@ -1,5 +1,5 @@
 import { Transition } from '@headlessui/react';
-import { Head, useForm } from '@inertiajs/react';
+import { Form, Head, useForm } from '@inertiajs/react';
 import { History, Key, Lock, ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
@@ -24,6 +24,7 @@ import { useTranslations } from '@/hooks/use-translations';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import ProfileLayout from '@/layouts/settings/profile-layout';
+import { disable, enable } from '@/routes/two-factor';
 import { type BreadcrumbItem } from '@/types';
 
 interface PasswordHistoryEntry {
@@ -353,30 +354,21 @@ export default function Authentication({
                                             }
                                             errors={twoFactorErrors}
                                         />
-                                        <form
-                                            onSubmit={(e) => {
-                                                e.preventDefault();
-                                                // Disable 2FA via Fortify route
-                                                window.axios
-                                                    .delete(
-                                                        '/user/two-factor-authentication',
-                                                    )
-                                                    .then(() =>
-                                                        window.location.reload(),
-                                                    );
-                                            }}
-                                        >
-                                            <Button
-                                                variant="destructive"
-                                                type="submit"
-                                            >
-                                                <ShieldBan className="mr-2 h-4 w-4" />
-                                                {t(
-                                                    'settings.two_factor.disable_2fa',
-                                                    'Disable 2FA',
-                                                )}
-                                            </Button>
-                                        </form>
+                                        <Form {...disable.form()}>
+                                            {({ processing }) => (
+                                                <Button
+                                                    variant="destructive"
+                                                    type="submit"
+                                                    disabled={processing}
+                                                >
+                                                    <ShieldBan className="mr-2 h-4 w-4" />
+                                                    {t(
+                                                        'settings.two_factor.disable_2fa',
+                                                        'Disable 2FA',
+                                                    )}
+                                                </Button>
+                                            )}
+                                        </Form>
                                     </div>
                                 ) : (
                                     <div>
@@ -393,27 +385,25 @@ export default function Authentication({
                                                 )}
                                             </Button>
                                         ) : (
-                                            <Button
-                                                onClick={() => {
-                                                    // Enable 2FA via Fortify route
-                                                    window.axios
-                                                        .post(
-                                                            '/user/two-factor-authentication',
-                                                        )
-                                                        .then(() => {
-                                                            fetchSetupData();
-                                                            setShowSetupModal(
-                                                                true,
-                                                            );
-                                                        });
-                                                }}
+                                            <Form
+                                                {...enable.form()}
+                                                onSuccess={() =>
+                                                    setShowSetupModal(true)
+                                                }
                                             >
-                                                <ShieldCheck className="mr-2 h-4 w-4" />
-                                                {t(
-                                                    'settings.two_factor.enable_2fa',
-                                                    'Enable 2FA',
+                                                {({ processing }) => (
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={processing}
+                                                    >
+                                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                                        {t(
+                                                            'settings.two_factor.enable_2fa',
+                                                            'Enable 2FA',
+                                                        )}
+                                                    </Button>
                                                 )}
-                                            </Button>
+                                            </Form>
                                         )}
                                     </div>
                                 )}
