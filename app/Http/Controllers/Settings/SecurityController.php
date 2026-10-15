@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
+use Laravel\Passkeys\Passkey;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class SecurityController extends Controller implements HasMiddleware
@@ -46,6 +47,23 @@ class SecurityController extends Controller implements HasMiddleware
         return Inertia::render('settings/security/authentication', [
             'passwordHistory' => $passwordHistory,
             'hasPassword' => ! is_null($request->user()->password),
+            'canManagePasskeys' => Features::canManagePasskeys(),
+            'passkeys' => Features::canManagePasskeys()
+                ? $request->user()
+                    ->passkeys()
+                    ->select(['id', 'name', 'credential', 'created_at', 'last_used_at'])
+                    ->latest()
+                    ->get()
+                    ->map(fn (Passkey $passkey) => [
+                        'id' => $passkey->id,
+                        'name' => $passkey->name,
+                        'authenticator' => $passkey->authenticator,
+                        'created_at_diff' => $passkey->created_at->diffForHumans(),
+                        'last_used_at_diff' => $passkey->last_used_at?->diffForHumans(),
+                    ])
+                    ->values()
+                    ->all()
+                : [],
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);

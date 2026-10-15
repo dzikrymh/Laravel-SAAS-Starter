@@ -94,3 +94,10 @@ Route::middleware('auth')->group(function () {
     // Session Summary
     Route::get('settings/session-summary', SessionSummaryController::class)->name('session-summary.index');
 });
+
+Route::get('.well-known/passkey-endpoints', function () {
+    return response()->json([
+        'enroll' => route('security.authentication'),
+        'manage' => route('security.authentication'),
+    ]);
+})->name('well-known.passkeys');

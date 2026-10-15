@@ -188,3 +188,25 @@ it('allows the logout route for members without 2FA', function () {
 
     expect($response->getContent())->toBe('ok');
 });
+
+it('allows members who only have a passkey as their second factor', function () {
+    $owner = User::factory()->withoutTwoFactor()->create();
+    $workspace = Workspace::factory()->create([
+        'owner_id' => $owner->id,
+        'require_two_factor' => true,
+    ]);
+
+    $member = User::factory()->withoutTwoFactor()->withPasskey()->create([
+        'current_workspace_id' => $workspace->id,
+    ]);
+    $workspace->users()->attach($member->id, ['role' => 'member']);
+    $member->load('currentWorkspace');
+
+    $middleware = new RequireTwoFactor;
+    $request = Request::create('/dashboard');
+    $request->setUserResolver(fn () => $member);
+
+    $response = $middleware->handle($request, fn () => response('ok'));
+
+    expect($response->getContent())->toBe('ok');
+});

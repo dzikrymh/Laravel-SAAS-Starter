@@ -44,7 +44,25 @@ it('marks complete_profile as completed when user has a bio', function () {
 });
 
 it('marks enable_2fa as completed when 2FA is confirmed', function () {
-    $this->user->forceFill(['two_factor_confirmed_at' => now()])->save();
+    $this->user->forceFill([
+        'two_factor_secret' => encrypt('secret'),
+        'two_factor_confirmed_at' => now(),
+    ])->save();
+
+    $response = actingAs($this->user)
+        ->getJson('/onboarding-checklist')
+        ->assertOk();
+
+    $steps = collect($response->json('steps'));
+    expect($steps->firstWhere('id', 'enable_2fa')['completed'])->toBeTrue();
+});
+
+it('marks enable_2fa as completed when the user has a passkey', function () {
+    $this->user->passkeys()->create([
+        'name' => 'MacBook Pro',
+        'credential_id' => 'credential-id',
+        'credential' => [],
+    ]);
 
     $response = actingAs($this->user)
         ->getJson('/onboarding-checklist')

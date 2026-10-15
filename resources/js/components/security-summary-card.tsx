@@ -18,6 +18,7 @@ import {
     AlertTriangle,
     ArrowRight,
     CheckCircle,
+    Fingerprint,
     Key,
     Lock,
     Shield,
@@ -39,6 +40,9 @@ interface SecuritySummaryData {
         two_factor: {
             enabled: boolean;
             confirmed_at: string | null;
+        };
+        passkeys: {
+            count: number;
         };
         social_accounts: Array<{
             id: number;
@@ -302,6 +306,40 @@ export function SecuritySummaryCard() {
                                 </SectionLink>
                             </Button>
                         )}
+                    </div>
+                </div>
+
+                {/* Passkeys */}
+                <div className="flex items-start gap-4">
+                    <div
+                        className={`rounded-full p-2 ${authentication.passkeys.count > 0 ? 'bg-green-100 dark:bg-green-950' : 'bg-muted'}`}
+                    >
+                        <Fingerprint
+                            className={`h-4 w-4 ${authentication.passkeys.count > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium">Passkeys</span>
+                            <Badge variant="secondary">
+                                {authentication.passkeys.count} registered
+                            </Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Sign in with Face ID, Touch ID or a security key
+                        </p>
+                        <Button
+                            variant="link"
+                            size="sm"
+                            className="mt-1 h-auto p-0"
+                            asChild
+                        >
+                            <SectionLink href="/settings/security/authentication#passkeys">
+                                {authentication.passkeys.count > 0
+                                    ? 'Manage passkeys →'
+                                    : 'Add passkey →'}
+                            </SectionLink>
+                        </Button>
                     </div>
                 </div>
 

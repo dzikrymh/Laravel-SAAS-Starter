@@ -46,7 +46,7 @@ class RequireTwoFactor
             return $next($request);
         }
 
-        if (! $user->hasEnabledTwoFactorAuthentication()) {
+        if (! $user->hasSecondFactor()) {
             return redirect()->route('workspace.two-factor-required');
         }
 

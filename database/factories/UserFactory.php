@@ -60,6 +60,20 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user has registered a passkey.
+     */
+    public function withPasskey(string $name = 'MacBook Pro'): static
+    {
+        return $this->afterCreating(function (User $user) use ($name): void {
+            $user->passkeys()->create([
+                'name' => $name,
+                'credential_id' => Str::random(43),
+                'credential' => ['aaguid' => '00000000-0000-0000-0000-000000000000'],
+            ]);
+        });
+    }
+
+    /**
      * Indicate that the user is a superadmin.
      */
     public function superadmin(): static

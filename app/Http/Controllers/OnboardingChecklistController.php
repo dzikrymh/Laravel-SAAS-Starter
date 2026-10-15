@@ -32,7 +32,7 @@ class OnboardingChecklistController extends Controller
                 'id' => 'enable_2fa',
                 'label' => 'Enable two-factor authentication',
                 'description' => 'Secure your account with 2FA',
-                'completed' => $user->two_factor_confirmed_at !== null,
+                'completed' => $user->hasSecondFactor(),
                 'href' => '/settings/two-factor',
             ],
             [

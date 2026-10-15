@@ -50,6 +50,10 @@ export default function WorkspaceTwoFactorRequired({
                             access it.
                         </p>
                     )}
+                    <p className="text-sm text-muted-foreground">
+                        An authenticator app or a passkey both satisfy this
+                        requirement.
+                    </p>
                 </div>
 
                 {/* Owner escape hatch: reach settings to disable the requirement */}

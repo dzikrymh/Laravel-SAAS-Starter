@@ -4,6 +4,7 @@ import { History, Key, Lock, ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 import InputError from '@/components/input-error';
+import ManagePasskeys from '@/components/manage-passkeys';
 import { SecuritySummaryCard } from '@/components/security-summary-card';
 import { SessionSummaryCard } from '@/components/session-summary-card';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
@@ -25,7 +26,7 @@ import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import ProfileLayout from '@/layouts/settings/profile-layout';
 import { disable, enable } from '@/routes/two-factor';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type Passkey } from '@/types';
 
 interface PasswordHistoryEntry {
     id: number;
@@ -39,6 +40,8 @@ interface AuthenticationProps {
     hasPassword: boolean;
     twoFactorEnabled: boolean;
     requiresConfirmation: boolean;
+    canManagePasskeys: boolean;
+    passkeys: Passkey[];
 }
 
 export default function Authentication({
@@ -46,6 +49,8 @@ export default function Authentication({
     hasPassword,
     twoFactorEnabled,
     requiresConfirmation,
+    canManagePasskeys,
+    passkeys,
 }: AuthenticationProps) {
     const { t } = useTranslations();
     const passwordInput = useForm({
@@ -97,7 +102,7 @@ export default function Authentication({
                 <div className="space-y-8">
                     {/* Security Summary */}
                     <SecuritySummaryCard
-                        key={`${hasPassword}-${twoFactorEnabled}`}
+                        key={`${hasPassword}-${twoFactorEnabled}-${passkeys.length}`}
                     />
 
                     {/* Session Summary */}
@@ -417,6 +422,10 @@ export default function Authentication({
                             </div>
                         </CardContent>
                     </Card>
+
+                    {canManagePasskeys && (
+                        <ManagePasskeys passkeys={passkeys} />
+                    )}
 
                     <TwoFactorSetupModal
                         isOpen={showSetupModal}

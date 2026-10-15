@@ -21,6 +21,8 @@ class SecuritySummaryController extends Controller
         // Determine authentication methods
         $hasPassword = ! is_null($user->password) && $user->password !== '';
         $hasTwoFactor = ! is_null($user->two_factor_confirmed_at);
+        $passkeysCount = $user->passkeys()->count();
+        $hasSecondFactor = $hasTwoFactor || $passkeysCount > 0;
 
         // Get connected social accounts
         $socialAccounts = $user->connectedAccounts->map(fn ($account) => [
@@ -35,7 +37,7 @@ class SecuritySummaryController extends Controller
         if ($hasPassword) {
             $score += 40;
         }
-        if ($hasTwoFactor) {
+        if ($hasSecondFactor) {
             $score += 40;
         }
         if ($socialAccounts->isNotEmpty()) {
@@ -52,10 +54,13 @@ class SecuritySummaryController extends Controller
                     'enabled' => $hasTwoFactor,
                     'confirmed_at' => $user->two_factor_confirmed_at?->toIso8601String(),
                 ],
+                'passkeys' => [
+                    'count' => $passkeysCount,
+                ],
                 'social_accounts' => $socialAccounts,
             ],
             'security_score' => $score,
-            'recommendations' => $this->getRecommendations($hasPassword, $hasTwoFactor, $socialAccounts->isNotEmpty()),
+            'recommendations' => $this->getRecommendations($hasPassword, $hasSecondFactor, $socialAccounts->isNotEmpty()),
         ]);
     }
 
@@ -78,13 +83,13 @@ class SecuritySummaryController extends Controller
      *
      * @return list<array{text: string, priority: string, action?: string}>
      */
-    private function getRecommendations(bool $hasPassword, bool $hasTwoFactor, bool $hasSocial): array
+    private function getRecommendations(bool $hasPassword, bool $hasSecondFactor, bool $hasSocial): array
     {
         $recommendations = [];
 
-        if (! $hasTwoFactor) {
+        if (! $hasSecondFactor) {
             $recommendations[] = [
-                'text' => 'Enable two-factor authentication for enhanced security',
+                'text' => 'Enable two-factor authentication or add a passkey for enhanced security',
                 'priority' => 'high',
                 'action' => '/settings/security/authentication#two-factor',
             ];

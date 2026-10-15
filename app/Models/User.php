@@ -13,15 +13,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Fortify\Contracts\PasskeyUser;
+use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, \Laravel\Scout\Searchable, LogsActivity, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, \Laravel\Scout\Searchable, LogsActivity, Notifiable, PasskeyAuthenticatable, SoftDeletes, TwoFactorAuthenticatable;
 
     /**
      * Get the indexable data array for the model.
@@ -218,6 +220,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Determine if the user has a second factor, either a confirmed authenticator app or a passkey.
+     */
+    public function hasSecondFactor(): bool
+    {
+        return $this->hasEnabledTwoFactorAuthentication() || $this->hasPasskeysEnabled();
+    }
+
+    /**
      * Get the user's avatar URL with fallback.
      */
     public function getAvatarUrlAttribute($value): ?string
@@ -357,7 +367,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ['label' => 'Profile photo', 'filled' => ! empty($this->avatar_url)],
             ['label' => 'Bio', 'filled' => ! empty($this->bio)],
             ['label' => 'Timezone', 'filled' => ! empty($this->timezone) && $this->timezone !== 'UTC'],
-            ['label' => 'Two-factor authentication', 'filled' => ! is_null($this->two_factor_confirmed_at)],
+            ['label' => 'Two-factor authentication', 'filled' => $this->hasSecondFactor()],
         ];
 
         $total = count($checks);

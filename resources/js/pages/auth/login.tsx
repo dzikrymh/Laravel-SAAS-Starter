@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import PasskeyVerify from '@/components/passkey-verify';
 import SocialLoginButtons from '@/components/social-login-buttons';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -156,6 +157,8 @@ export default function Login({
                                     Sign in with Magic Link
                                 </Button>
                             </Link>
+
+                            <PasskeyVerify size="lg" />
                         </div>
 
                         {canRegister && (

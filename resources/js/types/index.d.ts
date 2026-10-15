@@ -182,6 +182,14 @@ export interface SessionSummary {
     } | null;
 }
 
+export interface Passkey {
+    id: number;
+    name: string;
+    authenticator: string | null;
+    created_at_diff: string;
+    last_used_at_diff: string | null;
+}
+
 declare global {
     interface Window {
         Pusher: typeof import('pusher-js').default;

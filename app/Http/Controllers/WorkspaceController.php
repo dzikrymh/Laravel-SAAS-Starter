@@ -286,7 +286,7 @@ class WorkspaceController extends Controller
             [
                 'key' => 'owner_has_2fa',
                 'label' => 'Enable two-factor authentication',
-                'completed' => $user->two_factor_secret !== null,
+                'completed' => $user->hasSecondFactor(),
             ],
         ];
 
