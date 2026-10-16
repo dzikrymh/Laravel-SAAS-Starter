@@ -1,12 +1,5 @@
 {
     "mcpServers": {
-        "laravel-boost": {
-            "command": "php",
-            "args": [
-                "artisan",
-                "boost:mcp"
-            ]
-        },
         "herd": {
             "command": "php",
             "args": [
