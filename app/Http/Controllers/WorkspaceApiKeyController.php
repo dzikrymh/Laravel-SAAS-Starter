@@ -16,7 +16,7 @@ class WorkspaceApiKeyController extends Controller
     /**
      * Display the workspace API keys management page.
      */
-    public function index(Request $request): Response
+    public function index(Request $request, PlanLimitService $planLimitService): Response
     {
         $user = $request->user();
         $workspace = $user->currentWorkspace;
@@ -41,6 +41,9 @@ class WorkspaceApiKeyController extends Controller
             'keys' => $keys,
             'availableScopes' => WorkspaceApiKey::AVAILABLE_SCOPES,
             'isAdmin' => $workspace->userIsAdmin($user),
+            'planLimit' => $planLimitService->canCreateApiKey($workspace)
+                ? null
+                : $planLimitService->limitReachedDetails($workspace, 'api_keys', $user),
         ]);
     }
 
@@ -54,7 +57,7 @@ class WorkspaceApiKeyController extends Controller
         Gate::authorize('manageTeam', $workspace);
 
         if (! $planLimitService->canCreateApiKey($workspace)) {
-            return $this->planLimitReached($workspace, $user, 'api_keys', 'You have reached your API key limit. Please upgrade your plan to create more API keys.');
+            return redirect()->back()->with('error', 'You have reached your API key limit. Please upgrade your plan to create more API keys.');
         }
 
         $validated = $request->validate([

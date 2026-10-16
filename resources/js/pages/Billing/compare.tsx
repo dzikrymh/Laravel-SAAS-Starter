@@ -295,7 +295,7 @@ export default function ComparePlans({
                                                             {value === -1 ? (
                                                                 <span className="font-bold text-primary">
                                                                     {t(
-                                                                        'upgrade_modal.unlimited',
+                                                                        'plan_limit.unlimited',
                                                                         'Unlimited',
                                                                     )}
                                                                 </span>

@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { PlanLimitAlert } from '@/components/plan-limit-alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +24,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
-import { Workspace } from '@/types';
+import { type PlanLimitReached, Workspace } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Activity, Plus, Shield, Trash2 } from 'lucide-react';
@@ -41,11 +42,13 @@ interface WebhookEndpoint {
 interface WebhookLogsProps {
     workspace: Workspace;
     endpoints: WebhookEndpoint[];
+    planLimit: PlanLimitReached | null;
 }
 
 export default function WorkspaceWebhooks({
     workspace,
     endpoints,
+    planLimit,
 }: WebhookLogsProps) {
     const { t } = useTranslations();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -103,6 +106,8 @@ export default function WorkspaceWebhooks({
                 fullWidth
             >
                 <div className="space-y-6">
+                    {planLimit && <PlanLimitAlert planLimit={planLimit} />}
+
                     <div className="flex justify-end gap-2">
                         <Button
                             variant="outline"
@@ -140,7 +145,7 @@ export default function WorkspaceWebhooks({
                             }}
                         >
                             <DialogTrigger asChild>
-                                <Button>
+                                <Button disabled={planLimit !== null}>
                                     <Plus className="mr-2 h-4 w-4" />
                                     {t(
                                         'workspace.webhooks.create_button',

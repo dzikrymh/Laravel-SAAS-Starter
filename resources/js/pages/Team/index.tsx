@@ -1,5 +1,5 @@
 import InputError from '@/components/input-error';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { PlanLimitAlert } from '@/components/plan-limit-alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
 import {
     type BreadcrumbItem,
+    type PlanLimitReached,
     type TeamMember,
     type Workspace,
     type WorkspaceInvitation,
@@ -51,7 +52,6 @@ import {
 import { Head, router, useForm } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import {
-    AlertTriangle,
     Check,
     Clock,
     Copy,
@@ -129,6 +129,7 @@ interface TeamIndexProps {
     userRole: WorkspaceRole;
     canInvite: boolean;
     memberLimitMessage: string;
+    planLimit: PlanLimitReached | null;
     permissionPresets: PermissionPreset[];
 }
 
@@ -142,6 +143,7 @@ export default function TeamIndex({
     userRole,
     canInvite,
     memberLimitMessage,
+    planLimit,
     permissionPresets = [],
 }: TeamIndexProps) {
     const [inviteOpen, setInviteOpen] = useState(false);
@@ -402,30 +404,7 @@ export default function TeamIndex({
                 fullWidth
             >
                 <div className="space-y-6">
-                    {!canInvite && (
-                        <Alert className="border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30">
-                            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                            <AlertTitle className="text-amber-800 dark:text-amber-300">
-                                Team member limit reached
-                            </AlertTitle>
-                            <AlertDescription className="flex items-center justify-between gap-4">
-                                <span className="text-amber-700 dark:text-amber-400">
-                                    {memberLimitMessage} Upgrade your plan to
-                                    invite more members.
-                                </span>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="shrink-0 border-amber-400 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/50"
-                                    asChild
-                                >
-                                    <a href="/workspaces/billing">
-                                        Upgrade Plan
-                                    </a>
-                                </Button>
-                            </AlertDescription>
-                        </Alert>
-                    )}
+                    {planLimit && <PlanLimitAlert planLimit={planLimit} />}
                     <div className="flex items-center justify-end gap-2">
                         {isAdmin && (
                             <Button

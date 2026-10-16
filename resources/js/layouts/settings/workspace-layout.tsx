@@ -18,6 +18,7 @@ import {
     CreditCard,
     FileUp,
     History,
+    KeyRound,
     Shield,
     TrendingUp,
     Users,
@@ -99,6 +100,12 @@ const getNavSections = (
             title: t('navigation.security_settings', 'Security Settings'),
             href: '/settings/workspace-security',
             icon: Shield,
+            allowedRoles: ['owner', 'admin'],
+        },
+        {
+            title: t('navigation.api_keys', 'API Keys'),
+            href: '/workspaces/api-keys',
+            icon: KeyRound,
             allowedRoles: ['owner', 'admin'],
         },
         {

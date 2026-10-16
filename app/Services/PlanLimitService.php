@@ -106,7 +106,7 @@ class PlanLimitService
     }
 
     /**
-     * Describe a plan limit that blocked an action, for the frontend upgrade modal.
+     * Describe a reached plan limit for the frontend plan limit alert.
      *
      * @param  'team_members'|'api_keys'|'webhooks'  $resource
      * @return array{resource: string, can_upgrade: bool, current_plan: array{key: string, name: string, limit: int}, next_plan: array{key: string, name: string, limit: int}|null}

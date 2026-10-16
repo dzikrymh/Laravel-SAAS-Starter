@@ -74,6 +74,7 @@ class TeamController extends Controller
             'userRole' => $workspace->getUserRole($user),
             'canInvite' => $this->invitationService->canInvite($workspace),
             'memberLimitMessage' => $this->invitationService->getMemberLimitMessage($workspace),
+            'planLimit' => $this->invitationService->memberLimitReachedDetails($workspace, $user),
             'permissionPresets' => PermissionPreset::query()->orderBy('name')->get(['id', 'name', 'description', 'permissions']),
         ]);
     }
@@ -93,7 +94,8 @@ class TeamController extends Controller
         ]);
 
         if (! $this->invitationService->canInvite($workspace)) {
-            return $this->planLimitReached($workspace, $user, 'team_members', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
+            return redirect()->back()
+                ->with('error', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
         }
 
         try {

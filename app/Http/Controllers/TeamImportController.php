@@ -32,6 +32,7 @@ class TeamImportController extends Controller
             ],
             'canInvite' => $this->invitationService->canInvite($workspace),
             'memberLimitMessage' => $this->invitationService->getMemberLimitMessage($workspace),
+            'planLimit' => $this->invitationService->memberLimitReachedDetails($workspace, $request->user()),
         ]);
     }
 
@@ -61,6 +62,7 @@ class TeamImportController extends Controller
             ],
             'canInvite' => $this->invitationService->canInvite($workspace),
             'memberLimitMessage' => $this->invitationService->getMemberLimitMessage($workspace),
+            'planLimit' => $this->invitationService->memberLimitReachedDetails($workspace, $request->user()),
             'preview' => $result,
         ]);
     }

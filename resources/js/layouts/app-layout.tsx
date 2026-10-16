@@ -1,6 +1,5 @@
 import CookieConsentBanner from '@/components/cookie-consent-banner';
 import { useToast } from '@/components/ui/toast';
-import { UpgradeModal } from '@/components/upgrade-modal';
 import { FeatureProvider } from '@/contexts/feature-context';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
@@ -51,7 +50,6 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
                 </AppLayoutTemplate>
             </FeatureProvider>
             <CookieConsentBanner />
-            <UpgradeModal />
         </>
     );
 };

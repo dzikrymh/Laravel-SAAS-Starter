@@ -1,3 +1,4 @@
+import { PlanLimitAlert } from '@/components/plan-limit-alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,10 +10,9 @@ import {
 } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PlanLimitReached } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
-    AlertTriangle,
     CheckCircle2,
     Download,
     FileUp,
@@ -44,6 +44,7 @@ interface TeamImportProps {
     };
     canInvite: boolean;
     memberLimitMessage: string;
+    planLimit: PlanLimitReached | null;
     preview?: PreviewResult;
 }
 
@@ -73,6 +74,7 @@ const STATUS_STYLES: Record<
 export default function TeamImport({
     canInvite,
     memberLimitMessage,
+    planLimit,
     preview,
 }: TeamImportProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -136,13 +138,7 @@ export default function TeamImport({
                         {memberLimitMessage}
                     </div>
 
-                    {!canInvite && (
-                        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-                            <AlertTriangle className="-mt-0.5 mr-1.5 inline h-4 w-4" />
-                            You have reached your team member limit. Please
-                            upgrade your plan to invite more members.
-                        </div>
-                    )}
+                    {planLimit && <PlanLimitAlert planLimit={planLimit} />}
 
                     {/* Upload Section */}
                     <Card>

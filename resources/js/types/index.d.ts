@@ -117,7 +117,6 @@ export interface PlanLimitReached {
 export interface Flash {
     success?: string;
     error?: string;
-    plan_limit?: PlanLimitReached | null;
 }
 
 export interface SharedData {

@@ -113,7 +113,6 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'info' => $request->session()->get('info'),
                 'token' => $request->session()->get('token'),
-                'plan_limit' => $request->session()->get('plan_limit'),
             ],
             'announcement' => Announcement::currentlyActive()->latest()->first()?->only('id', 'title', 'body', 'type', 'link_text', 'link_url', 'is_dismissible'),
             'seo' => fn () => SeoMetadata::forPath($request->path())?->only('title', 'description', 'keywords', 'og_title', 'og_description', 'og_image', 'og_type', 'twitter_card', 'twitter_site', 'twitter_creator', 'twitter_image'),

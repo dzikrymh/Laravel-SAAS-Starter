@@ -1,3 +1,4 @@
+import { PlanLimitAlert } from '@/components/plan-limit-alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PlanLimitReached } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Copy, Key, Plus, Shield, Trash2 } from 'lucide-react';
@@ -40,6 +41,7 @@ interface Props {
     keys: ApiKey[];
     availableScopes: string[];
     isAdmin: boolean;
+    planLimit: PlanLimitReached | null;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,11 +53,11 @@ export default function WorkspaceApiKeys({
     keys,
     availableScopes,
     isAdmin,
+    planLimit,
 }: Props) {
     const { props } = usePage();
     const flash = props.flash as
-        | { newKey?: string; success?: string }
-        | undefined;
+        { newKey?: string; success?: string } | undefined;
 
     const [showForm, setShowForm] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<ApiKey | null>(null);
@@ -115,6 +117,8 @@ export default function WorkspaceApiKeys({
                 description="Manage API keys scoped to this workspace. These are separate from personal access tokens."
                 fullWidth
             >
+                {planLimit && <PlanLimitAlert planLimit={planLimit} />}
+
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
@@ -130,6 +134,7 @@ export default function WorkspaceApiKeys({
                         <Button
                             onClick={() => setShowForm(!showForm)}
                             size="sm"
+                            disabled={planLimit !== null}
                         >
                             <Plus className="mr-1.5 h-4 w-4" />
                             Create Key

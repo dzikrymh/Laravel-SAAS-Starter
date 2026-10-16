@@ -117,6 +117,20 @@ class InvitationService
     }
 
     /**
+     * Describe the reached team member limit, or null while the workspace can still invite.
+     *
+     * @return array{resource: string, can_upgrade: bool, current_plan: array{key: string, name: string, limit: int}, next_plan: array{key: string, name: string, limit: int}|null}|null
+     */
+    public function memberLimitReachedDetails(Workspace $workspace, User $user): ?array
+    {
+        if ($this->canInvite($workspace)) {
+            return null;
+        }
+
+        return app(PlanLimitService::class)->limitReachedDetails($workspace, 'team_members', $user);
+    }
+
+    /**
      * Get the team member limit message for the workspace.
      */
     public function getMemberLimitMessage(Workspace $workspace): string

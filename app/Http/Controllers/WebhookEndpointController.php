@@ -17,7 +17,7 @@ class WebhookEndpointController extends Controller
     /**
      * Display a listing of the webhooks.
      */
-    public function index(Request $request, Workspace $workspace): Response
+    public function index(Request $request, Workspace $workspace, PlanLimitService $planLimitService): Response
     {
         Gate::authorize('viewAny', [WebhookEndpoint::class, $workspace]);
 
@@ -26,6 +26,9 @@ class WebhookEndpointController extends Controller
         return Inertia::render('workspaces/webhooks/index', [
             'workspace' => $workspace,
             'endpoints' => $endpoints,
+            'planLimit' => $planLimitService->canCreateWebhook($workspace)
+                ? null
+                : $planLimitService->limitReachedDetails($workspace, 'webhooks', $request->user()),
         ]);
     }
 
@@ -37,7 +40,7 @@ class WebhookEndpointController extends Controller
         Gate::authorize('create', [WebhookEndpoint::class, $workspace]);
 
         if (! $planLimitService->canCreateWebhook($workspace)) {
-            return $this->planLimitReached($workspace, $request->user(), 'webhooks', 'You have reached your webhook limit. Please upgrade your plan to create more webhooks.');
+            return back()->with('error', 'You have reached your webhook limit. Please upgrade your plan to create more webhooks.');
         }
 
         $validated = $request->validate([
