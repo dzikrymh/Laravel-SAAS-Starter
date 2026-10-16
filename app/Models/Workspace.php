@@ -82,6 +82,8 @@ class Workspace extends Model
             'allowed_ips' => 'array',
             'allowed_email_domains' => 'array',
             'suspended_at' => 'datetime',
+            'subscription_paused_at' => 'datetime',
+            'subscription_resumes_at' => 'datetime',
         ];
     }
 
@@ -405,29 +407,47 @@ class Workspace extends Model
             return $this->resolvedPlan = ['name' => $this->plan_override, 'key' => strtolower($this->plan_override)];
         }
 
-        if ($this->subscribed('default')) {
-            $subscription = $this->subscription('default');
-            $priceId = $subscription->stripe_price;
-
-            $plans = config('billing.plans');
-
-            foreach ($plans as $planKey => $plan) {
-                if ($planKey === 'free') {
-                    continue;
-                }
-
-                $monthlyPriceId = $plan['stripe_price_id']['monthly'] ?? null;
-                $yearlyPriceId = $plan['stripe_price_id']['yearly'] ?? null;
-
-                if ($priceId === $monthlyPriceId || $priceId === $yearlyPriceId) {
-                    return $this->resolvedPlan = ['name' => $plan['name'], 'key' => $planKey];
-                }
-            }
-
-            return $this->resolvedPlan = ['name' => 'Pro', 'key' => 'pro'];
+        if ($this->subscribed('default') && ! $this->subscriptionPaused()) {
+            return $this->resolvedPlan = $this->subscribedPlan();
         }
 
         return $this->resolvedPlan = ['name' => 'Free', 'key' => 'free'];
+    }
+
+    /**
+     * Resolve the plan that the Stripe subscription is for, ignoring overrides and pauses.
+     *
+     * @return array{name: string, key: string}
+     */
+    public function subscribedPlan(): array
+    {
+        $priceId = $this->subscription('default')?->stripe_price;
+
+        foreach (config('billing.plans') as $planKey => $plan) {
+            if ($planKey === 'free') {
+                continue;
+            }
+
+            $monthlyPriceId = $plan['stripe_price_id']['monthly'] ?? null;
+            $yearlyPriceId = $plan['stripe_price_id']['yearly'] ?? null;
+
+            if ($priceId === $monthlyPriceId || $priceId === $yearlyPriceId) {
+                return ['name' => $plan['name'], 'key' => $planKey];
+            }
+        }
+
+        return ['name' => 'Pro', 'key' => 'pro'];
+    }
+
+    /**
+     * Whether payment collection is paused, so the workspace falls back to Free plan limits.
+     *
+     * A pause without a resume date (e.g. set from the Stripe Dashboard) lasts until resumed.
+     */
+    public function subscriptionPaused(): bool
+    {
+        return $this->subscription_paused_at !== null
+            && ($this->subscription_resumes_at === null || $this->subscription_resumes_at->isFuture());
     }
 
     /**
@@ -460,7 +480,7 @@ class Workspace extends Model
      */
     public function onFreePlan(): bool
     {
-        return ! $this->subscribed('default');
+        return ! $this->subscribed('default') || $this->subscriptionPaused();
     }
 
     /**

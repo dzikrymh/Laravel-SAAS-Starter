@@ -38,6 +38,9 @@ class BillingController extends Controller
                 'ends_at' => $subscription->ends_at,
                 'on_grace_period' => $subscription->onGracePeriod(),
                 'cancelled' => $subscription->canceled(),
+                'paused' => $workspace->subscriptionPaused(),
+                'resumes_at' => $workspace->subscriptionPaused() ? $workspace->subscription_resumes_at : null,
+                'plan' => $workspace->subscribedPlan()['name'],
             ] : null,
             'upcoming_invoice' => Inertia::defer(function () use ($workspace, $subscription) {
                 if ($subscription && $subscription->active()) {
@@ -309,6 +312,98 @@ class BillingController extends Controller
                 'error' => 'Failed to resume subscription: '.$e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Pause payment collection for 1-3 months; the workspace uses Free plan limits meanwhile.
+     */
+    public function pause(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'months' => ['required', 'integer', 'in:1,2,3'],
+        ]);
+
+        $workspace = $request->user()->currentWorkspace;
+        Gate::authorize('manageBilling', $workspace);
+
+        $subscription = $workspace->subscription('default');
+
+        if (! $subscription || ! $subscription->active() || $subscription->onGracePeriod() || $subscription->onTrial()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Only an active, paid subscription can be paused.',
+            ], 400);
+        }
+
+        if ($workspace->subscriptionPaused()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Your subscription is already paused.',
+            ], 400);
+        }
+
+        $resumesAt = now()->addMonthsNoOverflow($validated['months']);
+
+        try {
+            $subscription->updateStripeSubscription([
+                'pause_collection' => [
+                    'behavior' => 'void',
+                    'resumes_at' => $resumesAt->getTimestamp(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to pause subscription: '.$e->getMessage(),
+            ], 500);
+        }
+
+        $workspace->forceFill([
+            'subscription_paused_at' => now(),
+            'subscription_resumes_at' => $resumesAt,
+        ])->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Your subscription is paused until {$resumesAt->format('F j, Y')}.",
+        ]);
+    }
+
+    /**
+     * Resume payment collection on a paused subscription before its resume date.
+     */
+    public function unpause(Request $request): JsonResponse
+    {
+        $workspace = $request->user()->currentWorkspace;
+        Gate::authorize('manageBilling', $workspace);
+
+        $subscription = $workspace->subscription('default');
+
+        if (! $subscription || ! $workspace->subscriptionPaused()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Your subscription is not paused.',
+            ], 400);
+        }
+
+        try {
+            $subscription->updateStripeSubscription(['pause_collection' => '']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to resume subscription: '.$e->getMessage(),
+            ], 500);
+        }
+
+        $workspace->forceFill([
+            'subscription_paused_at' => null,
+            'subscription_resumes_at' => null,
+        ])->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Your subscription has been resumed.',
+        ]);
     }
 
     /**

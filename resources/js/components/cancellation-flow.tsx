@@ -31,9 +31,15 @@ interface CancellationFlowProps {
     isOpen: boolean;
     onClose: () => void;
     onCancelled: () => void;
+    onPaused: () => void;
     planName: string;
     endsAt: string | null;
+    /** Whether the subscription can be paused instead (active, paid, not already paused). */
+    canPause: boolean;
 }
+
+const PAUSE_REASON = 'temporary';
+const pauseDurations = ['1', '2', '3'];
 
 const cancellationReasons = [
     {
@@ -68,8 +74,10 @@ export default function CancellationFlow({
     isOpen,
     onClose,
     onCancelled,
+    onPaused,
     planName,
     endsAt,
+    canPause,
 }: CancellationFlowProps) {
     const [step, setStep] = useState<
         'reason' | 'offer' | 'confirm' | 'success'
@@ -77,13 +85,15 @@ export default function CancellationFlow({
     const [reason, setReason] = useState('');
     const [feedback, setFeedback] = useState('');
     const [loading, setLoading] = useState(false);
+    const [pauseMonths, setPauseMonths] = useState('1');
     const { addToast } = useToast();
 
     const handleReasonSubmit = () => {
         if (!reason) return;
 
         const selectedReason = cancellationReasons.find((r) => r.id === reason);
-        if (selectedReason?.offer) {
+        const offerAvailable = reason !== PAUSE_REASON || canPause;
+        if (selectedReason?.offer && offerAvailable) {
             setStep('offer');
         } else {
             setStep('confirm');
@@ -101,6 +111,31 @@ export default function CancellationFlow({
 
     const handleDeclineOffer = () => {
         setStep('confirm');
+    };
+
+    const handlePause = async () => {
+        setLoading(true);
+        try {
+            const { data } = await http.post<{
+                success?: boolean;
+                message?: string;
+                error?: string;
+            }>('/billing/pause', {
+                body: { months: Number(pauseMonths) },
+            });
+
+            if (data.success) {
+                addToast(data.message || 'Subscription paused.', 'success');
+                handleClose();
+                onPaused();
+            } else {
+                addToast(data.error || 'Failed to pause subscription', 'error');
+            }
+        } catch {
+            addToast('An error occurred. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleCancel = async () => {
@@ -148,11 +183,11 @@ export default function CancellationFlow({
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <AlertTriangle className="h-5 w-5 text-amber-500" />
-                                We\'re sorry to see you go
+                                We&apos;re sorry to see you go
                             </DialogTitle>
                             <DialogDescription>
-                                Please let us know why you\'re cancelling. Your
-                                feedback helps us improve.
+                                Please let us know why you&apos;re cancelling.
+                                Your feedback helps us improve.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -231,13 +266,48 @@ export default function CancellationFlow({
                                 <p className="text-sm font-medium text-primary">
                                     {selectedReason.offer}
                                 </p>
+                                {reason === PAUSE_REASON && (
+                                    <div className="mt-4 space-y-2">
+                                        <Label htmlFor="pause-months">
+                                            Pause for
+                                        </Label>
+                                        <Select
+                                            value={pauseMonths}
+                                            onValueChange={setPauseMonths}
+                                        >
+                                            <SelectTrigger id="pause-months">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {pauseDurations.map(
+                                                    (months) => (
+                                                        <SelectItem
+                                                            key={months}
+                                                            value={months}
+                                                        >
+                                                            {months === '1'
+                                                                ? '1 month'
+                                                                : `${months} months`}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        <p className="text-xs text-muted-foreground">
+                                            You won&apos;t be charged while
+                                            paused, and your workspace uses Free
+                                            plan limits until billing resumes
+                                            automatically.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="mt-4 flex items-start gap-3 text-sm text-muted-foreground">
                                 <Clock className="mt-0.5 h-4 w-4 shrink-0" />
                                 <p>
-                                    If you cancel now, you\'ll continue to have
-                                    access until{' '}
+                                    If you cancel now, you&apos;ll continue to
+                                    have access until{' '}
                                     <strong>
                                         {endsAt
                                             ? new Date(
@@ -258,12 +328,24 @@ export default function CancellationFlow({
                             >
                                 No thanks, continue cancelling
                             </Button>
-                            <Button
-                                onClick={handleAcceptOffer}
-                                className="w-full sm:w-auto"
-                            >
-                                Accept Offer
-                            </Button>
+                            {reason === PAUSE_REASON ? (
+                                <Button
+                                    onClick={handlePause}
+                                    disabled={loading}
+                                    className="w-full sm:w-auto"
+                                >
+                                    {loading
+                                        ? 'Pausing...'
+                                        : 'Pause Subscription'}
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleAcceptOffer}
+                                    className="w-full sm:w-auto"
+                                >
+                                    Accept Offer
+                                </Button>
+                            )}
                         </DialogFooter>
                     </>
                 )}
@@ -288,14 +370,14 @@ export default function CancellationFlow({
                                 </p>
                                 <ul className="list-inside list-disc space-y-1">
                                     <li>
-                                        You\'ll keep access until{' '}
+                                        You&apos;ll keep access until{' '}
                                         {endsAt
                                             ? new Date(
                                                   endsAt,
                                               ).toLocaleDateString()
                                             : 'the end of your billing period'}
                                     </li>
-                                    <li>You won\'t be charged again</li>
+                                    <li>You won&apos;t be charged again</li>
                                     <li>
                                         Your data will be preserved for 30 days
                                     </li>
@@ -333,8 +415,8 @@ export default function CancellationFlow({
                             Subscription Cancelled
                         </DialogTitle>
                         <DialogDescription>
-                            Your subscription has been cancelled. You\'ll have
-                            access until{' '}
+                            Your subscription has been cancelled. You&apos;ll
+                            have access until{' '}
                             {endsAt
                                 ? new Date(endsAt).toLocaleDateString()
                                 : 'the end of your billing period'}

@@ -51,6 +51,10 @@ interface Subscription {
     ends_at: string | null;
     on_grace_period: boolean;
     cancelled: boolean;
+    paused: boolean;
+    resumes_at: string | null;
+    /** The paid plan behind the subscription, even while paused. */
+    plan: string;
 }
 
 interface BillingWorkspace {
@@ -101,6 +105,7 @@ export default function BillingIndex({
     const currentPlan = plans.find((p) => p.name === workspace.plan);
     const [portalLoading, setPortalLoading] = useState(false);
     const [resumeLoading, setResumeLoading] = useState(false);
+    const [unpauseLoading, setUnpauseLoading] = useState(false);
     const [showCancelFlow, setShowCancelFlow] = useState(false);
     const { addToast } = useToast();
 
@@ -126,6 +131,28 @@ export default function BillingIndex({
         }
     };
 
+    const handleUnpauseSubscription = async () => {
+        setUnpauseLoading(true);
+        try {
+            const { data } = await http.delete<{
+                success?: boolean;
+                error?: string;
+            }>('/billing/pause');
+            if (data.success) {
+                window.location.reload();
+            } else {
+                addToast(
+                    data.error || 'Failed to resume subscription',
+                    'error',
+                );
+                setUnpauseLoading(false);
+            }
+        } catch (error) {
+            console.error('Unpause error:', error);
+            setUnpauseLoading(false);
+        }
+    };
+
     const handlePortalRedirect = async () => {
         setPortalLoading(true);
         try {
@@ -145,6 +172,12 @@ export default function BillingIndex({
         if (!subscription) {
             return (
                 <Badge variant="secondary">{t('billing.free', 'Free')}</Badge>
+            );
+        }
+
+        if (subscription.paused) {
+            return (
+                <Badge variant="outline">{t('billing.paused', 'Paused')}</Badge>
             );
         }
 
@@ -279,6 +312,57 @@ export default function BillingIndex({
                                                         )}
                                                 </div>
                                             )}
+                                        {subscription?.paused && (
+                                            <div className="mt-2 space-y-2">
+                                                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                                                    {subscription.resumes_at
+                                                        ? t(
+                                                              'billing.paused_until',
+                                                              'Your {{plan}} subscription is paused until {{date}}.',
+                                                              {
+                                                                  plan: subscription.plan,
+                                                                  date: new Date(
+                                                                      subscription.resumes_at,
+                                                                  ).toLocaleDateString(),
+                                                              },
+                                                          )
+                                                        : t(
+                                                              'billing.paused_indefinitely',
+                                                              'Your {{plan}} subscription is paused until you resume it.',
+                                                              {
+                                                                  plan: subscription.plan,
+                                                              },
+                                                          )}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {t(
+                                                        'billing.paused_description',
+                                                        "You won't be charged while paused, and your workspace uses Free plan limits until billing resumes.",
+                                                    )}
+                                                </p>
+                                                {isOwner && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={
+                                                            handleUnpauseSubscription
+                                                        }
+                                                        disabled={
+                                                            unpauseLoading
+                                                        }
+                                                        className="rounded-full"
+                                                    >
+                                                        {unpauseLoading && (
+                                                            <Spinner className="mr-2" />
+                                                        )}
+                                                        {t(
+                                                            'billing.resume_now',
+                                                            'Resume Now',
+                                                        )}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {isOwner && (
@@ -289,7 +373,9 @@ export default function BillingIndex({
                                                 className="rounded-full px-6 shadow-sm transition-transform active:scale-95"
                                             >
                                                 <Link href="/billing/plans">
-                                                    {workspace.plan === 'Free'
+                                                    {workspace.plan ===
+                                                        'Free' &&
+                                                    !subscription?.paused
                                                         ? t(
                                                               'billing.upgrade',
                                                               'Upgrade Now',
@@ -732,8 +818,14 @@ export default function BillingIndex({
                         isOpen={showCancelFlow}
                         onClose={() => setShowCancelFlow(false)}
                         onCancelled={() => window.location.reload()}
-                        planName={workspace.plan}
+                        onPaused={() => window.location.reload()}
+                        planName={subscription?.plan ?? workspace.plan}
                         endsAt={subscription?.ends_at || null}
+                        canPause={
+                            subscription?.status === 'active' &&
+                            !subscription.cancelled &&
+                            !subscription.paused
+                        }
                     />
                 </div>
             </WorkspaceLayout>

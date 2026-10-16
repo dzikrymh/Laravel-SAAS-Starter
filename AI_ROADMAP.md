@@ -26,7 +26,7 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 
 > ⚠️ **Dependency rule:** Tasks marked **[needs approval]** add a new Composer/NPM package or require a business decision. Per `CLAUDE.md`, do NOT install dependencies without user approval — stop and ask before starting those tasks, then continue with the next unblocked task.
 
-## 🚀 Active Sprint 41: Quick Wins
+## 🏁 Completed Sprint 41: Quick Wins
 
 > Low-risk tasks pulled forward from Sprints 42–45: no new dependencies, no approvals, and each builds on existing code. Revenue Recovery & Promotions moves to Sprint 41b.
 
@@ -34,7 +34,7 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - [x] **Task 197**: Per-Plan API Rate Limits — `/api/v1` routes previously had no rate limiting. Added `api_requests_per_minute` per plan in `config/billing.php` (Free 60 / Pro 300 / Business 1000), `PlanLimitService::getApiRequestsPerMinute()`, and a `workspace-api` limiter keyed by API key + plan. `AuthenticateApiKey` is prepended before `ThrottleRequests` in the middleware priority list so the limiter sees the key and 429s are logged as `was_throttled`. `api/*` errors always render as JSON. Limit shown on the API usage dashboard. 8 Pest tests. ✅
 - [x] **Task 190**: Contextual Plan Limit Alerts — Replaced the planned upgrade modal (per user feedback) with an inline `PlanLimitAlert` banner matching the Team page style, shown on Team, CSV Import, API Keys, and Webhooks when a limit is reached; the create/invite buttons are disabled. `PlanLimitService::limitReachedDetails()` feeds a `planLimit` page prop (current/next plan limits, `can_upgrade` via `manageBilling`); "Upgrade Plan" links to `/billing/plans?recommended_plan=…` (the Team banner previously linked to a non-existent `/workspaces/billing`, a 404). API key and webhook limits were previously not enforced at all; they now are. Added the missing "API Keys" item to the workspace settings nav. Compare page limit rows fixed (Team Members read a non-existent `limits.members` key; Storage row was a hardcoded "1GB") and now cover workspaces, members, API keys, webhooks, and API requests/min. Alert strings translated in all 5 locales. 11 Pest tests. ✅
 - [x] **Task 193**: Email Change Re-Verification — Saving a new email on the profile stores it as `pending_email` (new migration) instead of switching right away. `EmailChangeService` emails a 60-minute signed link (`profile.email.verify`, `auth` + `signed`, bound to a hash of the pending address so older links die) to the new address via `VerifyNewEmailNotification`, and a security notice to the current address via `EmailChangeRequestedNotification`. Confirming re-checks uniqueness, switches the email, and marks it verified; results come back as an `EmailChangeResult` enum status. Profile page shows the pending address with Resend / Cancel actions and translated status messages (5 locales). 13 Pest tests; two existing profile tests updated for the new behaviour. ✅
-- [ ] **Task 176**: Pause Subscription — Backend for the "pause" retention option already offered in `CancellationFlow` (Task 165): pause via Stripe `pause_collection` (1/2/3 months), resume endpoint, "Paused until …" state on billing page, and paused workspaces fall back to Free plan limits through `PlanLimitService`.
+- [x] **Task 176**: Pause Subscription — `POST /billing/pause` (1/2/3 months) sets Stripe `pause_collection` (`behavior: void`, `resumes_at`) and `DELETE /billing/pause` resumes early; both gated by `manageBilling` and limited to active, paid, non-cancelled subscriptions. New `workspaces.subscription_paused_at` / `subscription_resumes_at` columns, kept in sync by the `customer.subscription.updated` / `deleted` webhooks (including Stripe auto-resuming and Dashboard pauses with no resume date). While paused, `Workspace::getResolvedPlan()` returns Free (admin `plan_override` still wins), so `PlanLimitService`, invite limits, and API rate limits fall back to Free; the pause expires locally on its resume date even if a webhook is missed. `CancellationFlow` "Temporary break" offer now pauses for real (it used to show a fake "discount applied" toast) and literal `\'` text in the dialog was fixed; billing page shows a Paused badge, "paused until …" note, and Resume Now. 24 Pest tests. ✅
 
 ## 📋 Planned Sprint 41b: Revenue Recovery & Promotions
 
@@ -225,6 +225,8 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - **Sprint 12**: Enterprise Mechanics (Seat-Based Billing, Data Retention, 2FA Enforcement).
 
 ## 📝 Changelog
+
+- **2026-10-16**: Task 176 (Pause Subscription) complete — Stripe `pause_collection` pause/resume, webhook sync, Free plan fallback while paused, real pause option in the cancellation flow. Sprint 41 (Quick Wins) complete. ✅
 
 - **2026-10-16**: Task 193 (Email Change Re-Verification) complete — pending email + signed confirmation link to the new address, security notice to the old address, resend/cancel on the profile page. ✅
 

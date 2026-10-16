@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Workspace;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Http\Controllers\WebhookController as CashierWebhookController;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,6 +59,7 @@ class StripeWebhookController extends CashierWebhookController
 
         if ($workspace instanceof Workspace) {
             $workspace->refresh();
+            $this->syncPauseState($workspace, $data);
 
             Log::info('Subscription updated for workspace', [
                 'workspace_id' => $workspace->id,
@@ -85,6 +87,11 @@ class StripeWebhookController extends CashierWebhookController
         $workspace = $this->findBillable($data['customer']);
 
         if ($workspace instanceof Workspace) {
+            $workspace->forceFill([
+                'subscription_paused_at' => null,
+                'subscription_resumes_at' => null,
+            ])->save();
+
             Log::info('Subscription cancelled for workspace', [
                 'workspace_id' => $workspace->id,
                 'workspace_name' => $workspace->name,
@@ -97,6 +104,26 @@ class StripeWebhookController extends CashierWebhookController
         }
 
         return parent::handleCustomerSubscriptionDeleted($payload);
+    }
+
+    /**
+     * Mirror Stripe's `pause_collection` onto the workspace so its plan limits follow it,
+     * including when Stripe resumes collection on the scheduled date.
+     *
+     * @param  array<string, mixed>  $subscription
+     */
+    protected function syncPauseState(Workspace $workspace, array $subscription): void
+    {
+        if ($workspace->subscription('default')?->stripe_id !== $subscription['id']) {
+            return;
+        }
+
+        $pause = $subscription['pause_collection'] ?? null;
+
+        $workspace->forceFill([
+            'subscription_paused_at' => $pause ? ($workspace->subscription_paused_at ?? now()) : null,
+            'subscription_resumes_at' => isset($pause['resumes_at']) ? Carbon::createFromTimestamp($pause['resumes_at']) : null,
+        ])->save();
     }
 
     /**

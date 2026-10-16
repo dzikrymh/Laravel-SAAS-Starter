@@ -201,6 +201,8 @@ Route::middleware(['auth', 'verified', 'onboarded', 'workspace', 'require2fa', '
         Route::post('/subscribe', [BillingController::class, 'subscribe'])->name('subscribe');
         Route::post('/cancel', [BillingController::class, 'cancel'])->name('cancel');
         Route::post('/resume', [BillingController::class, 'resume'])->name('resume');
+        Route::post('/pause', [BillingController::class, 'pause'])->name('pause');
+        Route::delete('/pause', [BillingController::class, 'unpause'])->name('unpause');
         Route::get('/portal', [BillingController::class, 'portal'])->name('portal');
         Route::get('/invoices/{invoice}', [BillingController::class, 'downloadInvoice'])->name('invoice.download');
     });
