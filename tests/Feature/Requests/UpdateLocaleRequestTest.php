@@ -24,7 +24,7 @@ it('accepts valid locales', function (string $locale) {
     $validator = Validator::make(['locale' => $locale], $request->rules());
 
     expect($validator->passes())->toBeTrue();
-})->with(['en', 'fr', 'es', 'ar']);
+})->with(['en', 'fr', 'es', 'ar', 'id']);
 
 it('rejects invalid locales', function () {
     $request = new UpdateLocaleRequest;

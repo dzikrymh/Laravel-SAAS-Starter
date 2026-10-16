@@ -72,4 +72,4 @@ it('accepts all supported locales', function (string $locale) {
     });
 
     expect(App::getLocale())->toBe($locale);
-})->with(['en', 'es', 'fr', 'ar']);
+})->with(['en', 'es', 'fr', 'ar', 'id']);

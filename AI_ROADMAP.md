@@ -21,21 +21,29 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 ## 📌 Current State
 
 - **Stack**: Laravel 13, Inertia.js v3, React 19, Tailwind CSS v4, Stripe Cashier v16, Fortify.
-- **Completed Features**: Auth (2FA, Passkeys, Magic Link, Social Login), Workspaces, Teams, Stripe Billing (seats, invoices, cancellation flow), i18n (en/es/fr/ar), Dark Mode, Super Admin Panel, Feature Flags (Pennant), Announcements, Audit Logs, Command Palette, Webhooks, Workspace API Keys, Status Page, Support Tickets.
-- **Known Gaps** (addressed by Sprints 41–46): no dunning flow, no coupons/promo codes, no tax ID collection, no Bahasa Indonesia locale, no local payment gateway (QRIS/VA/e-wallet), SSO still "Coming Soon" in `config/billing.php`, no SCIM, no metered billing, no referral program, no email-change re-verification, no versioned ToS acceptance, no automated backups.
+- **Completed Features**: Auth (2FA, Passkeys, Magic Link, Social Login), Workspaces, Teams, Stripe Billing (seats, invoices, cancellation flow), i18n (en/es/fr/ar/id), Dark Mode, Super Admin Panel, Feature Flags (Pennant), Announcements, Audit Logs, Command Palette, Webhooks, Workspace API Keys, Status Page, Support Tickets.
+- **Known Gaps** (addressed by Sprints 41–46): no dunning flow, no coupons/promo codes, no tax ID collection, no local payment gateway (QRIS/VA/e-wallet), SSO still "Coming Soon" in `config/billing.php`, no SCIM, no metered billing, no referral program, no email-change re-verification, no versioned ToS acceptance, no automated backups.
 
 > ⚠️ **Dependency rule:** Tasks marked **[needs approval]** add a new Composer/NPM package or require a business decision. Per `CLAUDE.md`, do NOT install dependencies without user approval — stop and ask before starting those tasks, then continue with the next unblocked task.
 
-## 🚀 Active Sprint 41: Revenue Recovery & Promotions
+## 🚀 Active Sprint 41: Quick Wins
+
+> Low-risk tasks pulled forward from Sprints 42–45: no new dependencies, no approvals, and each builds on existing code. Revenue Recovery & Promotions moves to Sprint 41b.
+
+- [x] **Task 178**: Bahasa Indonesia Locale — `lang/id.json` (329 keys), `lang/id/notifications.php`, and `resources/js/locales/id.json` (318 keys) with full `en` coverage. Supported locales centralized in `config('app.supported_locales')`, used by `SetLocale` and `UpdateLocaleRequest`; `id` added to i18next and the language switcher. New `formatCurrency()` helper (`resources/js/lib/format-currency.ts`, whole-unit IDR); `id-ID` dates already handled by `formatDate()`. `TranslationParityTest` checks key parity for every locale and placeholder preservation for `id`. ✅
+- [ ] **Task 197**: Per-Plan API Rate Limits — Move API rate limits into plan config, `RateLimiter` keyed by workspace API key and plan, `X-RateLimit-*` headers, limits shown on API usage dashboard.
+- [ ] **Task 190**: Contextual Upgrade Modal — When a `PlanLimitService` check blocks an action (invite, API key, webhook), return a structured error that opens an upgrade modal showing the limit hit, the next plan's limit, and a one-click upgrade CTA.
+- [ ] **Task 193**: Email Change Re-Verification — Changing email stores `pending_email` and sends a signed verification link to the new address plus a security notice to the old address; email only switches after verification; pending state + cancel action on profile page.
+- [ ] **Task 176**: Pause Subscription — Backend for the "pause" retention option already offered in `CancellationFlow` (Task 165): pause via Stripe `pause_collection` (1/2/3 months), resume endpoint, "Paused until …" state on billing page, and paused workspaces fall back to Free plan limits through `PlanLimitService`.
+
+## 📋 Planned Sprint 41b: Revenue Recovery & Promotions
 
 - [ ] **Task 174**: Dunning Flow — When a subscription enters `past_due` (`StripeWebhookController`), show a persistent in-app banner to workspace owners/billing managers with an "Update Payment Method" CTA (Stripe billing portal). `app:send-dunning-reminders` command sends staged emails on day 1/3/7, deduplicated via `billing_reminder_logs`. Configurable grace period in `config/billing.php`; after it ends, auto-suspend via the existing workspace suspension flow (Task 73) and auto-restore on `invoice.paid`.
 - [ ] **Task 175**: Coupons & Promotion Codes — Promo code input on plan subscribe/checkout using Cashier `withPromotionCode()`; `POST /billing/promotion-codes/validate` endpoint returning discount preview; show the active discount on the billing page; admin page at `/admin/promotion-codes` to list/create/deactivate Stripe promotion codes.
-- [ ] **Task 176**: Pause Subscription — Backend for the "pause" retention option already offered in `CancellationFlow` (Task 165): pause via Stripe `pause_collection` (1/2/3 months), resume endpoint, "Paused until …" state on billing page, and paused workspaces fall back to Free plan limits through `PlanLimitService`.
 - [ ] **Task 177**: Tax ID & Billing Address — Collect billing address + tax IDs (VAT, NPWP) on the billing page via Cashier `createTaxId()` / `taxIds()`; tax IDs shown on invoice PDFs; opt-in Stripe Tax via `Cashier::calculateTaxes()` behind a config flag.
 
 ## 📋 Planned Sprint 42: Indonesian Market Launch
 
-- [ ] **Task 178**: Bahasa Indonesia Locale — Add `lang/id.json` + `lang/id/*` with full coverage of existing `en` keys; add `id` to the locale switcher and `SetLocale` allowed list; add a Pest test asserting every `en` key exists in `id`; IDR currency + `id-ID` date formatting helpers on the frontend.
 - [ ] **Task 179**: Payment Gateway Abstraction — Introduce a `PaymentGateway` contract so Stripe and a local provider can coexist; per-workspace `payment_provider` column; `BillingController` routes subscribe/cancel/invoice actions through the contract. Stripe remains the default implementation; no behaviour change for existing workspaces.
 - [ ] **Task 180**: Local Payment Gateway **[needs approval: provider choice (Xendit vs Midtrans) + SDK package]** — QRIS, Virtual Account, and e-wallet payments; recurring billing via scheduled invoices + payment links; webhook endpoint with signature verification; payment status synced to the subscription/workspace state; reuse dunning reminders from Task 174.
 - [ ] **Task 181**: PPN-Compliant Invoices — Configurable PPN rate in `config/billing.php`, NPWP and company name on IDR invoices, invoice numbering sequence per workspace, PDF layout with tax breakdown (DPP, PPN, total).
@@ -53,20 +61,17 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - [ ] **Task 187**: Metered Usage Billing — Report usage (API requests from `api_request_logs`, AI tokens) to Stripe Meters via a scheduled job; metered price items per plan in `config/billing.php`; current-period usage + projected cost on the usage dashboard.
 - [ ] **Task 188**: Plan Add-ons — Purchasable add-ons (extra seats, extra API keys, extra storage) as additional subscription items; `PlanLimitService` adds add-on quantities to base limits; add-on management card on billing page.
 - [ ] **Task 189**: Plan Versioning (Grandfathering) — `plan_version` on subscriptions; legacy price IDs kept in `config/billing.php`; existing subscribers keep their price when plans change; admin view showing subscribers per plan version with an optional migrate action.
-- [ ] **Task 190**: Contextual Upgrade Modal — When a `PlanLimitService` check blocks an action (invite, API key, webhook), return a structured error that opens an upgrade modal showing the limit hit, the next plan's limit, and a one-click upgrade CTA.
 
 ## 📋 Planned Sprint 45: Growth & Trust
 
 - [ ] **Task 191**: Referral Program — Unique referral link per user, `referrals` table tracking signup → paid conversion, reward as Stripe customer balance credit for the referrer, referral stats card in settings, admin referral report.
 - [ ] **Task 192**: Public Roadmap & Feature Voting — Extends the `Feedback` model: admin promotes feedback to roadmap items (planned/in progress/shipped), public `/roadmap` page with upvotes (one per user), voters notified when an item ships (links to changelog entry).
-- [ ] **Task 193**: Email Change Re-Verification — Changing email stores `pending_email` and sends a signed verification link to the new address plus a security notice to the old address; email only switches after verification; pending state + cancel action on profile page.
 - [ ] **Task 194**: Versioned Terms & Privacy Acceptance — `legal_documents` (type, version, published_at) and `legal_acceptances` (user, document version, IP, timestamp); acceptance checkbox on registration; middleware forcing re-acceptance when a new version is published (UU PDP / GDPR audit trail); admin page to publish new versions.
 
 ## 📋 Planned Sprint 46: Operational Resilience
 
 - [ ] **Task 195**: Automated Backups **[needs approval: `spatie/laravel-backup`]** — Daily database + storage backups to a configurable disk, retention policy, backup status/last run/size on the admin System Health page, failure notification to superadmins.
 - [ ] **Task 196**: Queue Monitoring **[needs approval: `laravel/horizon` + Redis]** — Horizon dashboard behind superadmin gate, or (if not approved) extend System Health with per-queue throughput, wait time, and long-wait alerts.
-- [ ] **Task 197**: Per-Plan API Rate Limits — Move API rate limits into plan config, `RateLimiter` keyed by workspace API key and plan, `X-RateLimit-*` headers, limits shown on API usage dashboard.
 
 ## 🏁 Completed Sprint 40: Advanced Workspace Features & Automation
 
@@ -220,6 +225,8 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - **Sprint 12**: Enterprise Mechanics (Seat-Based Billing, Data Retention, 2FA Enforcement).
 
 ## 📝 Changelog
+
+- **2026-10-16**: Sprint 41 replaced with a "Quick Wins" sprint (Tasks 178, 197, 190, 193, 176) pulled forward from later sprints; Revenue Recovery & Promotions moved to Sprint 41b. Task 178 (Bahasa Indonesia Locale) complete — backend/frontend/notification translations, centralized `app.supported_locales`, `formatCurrency()` helper, `TranslationParityTest`. ✅
 
 - **2026-10-16**: Roadmap reorganization. Closed out Sprints 30, 36, and 40 (all tasks complete) and moved them to Completed. Noted that Sprint 40 Tasks 170/172/173 (Templates, Tags, Custom Fields) were removed in `9f7ace8`; only Task 171 (Search) remains. Updated Current State to the installed stack (Laravel 13, Inertia v3). Planned Sprints 41–46 (Tasks 174–197): revenue recovery & promotions, Indonesian market launch, enterprise identity, monetization expansion, growth & trust, operational resilience. Sprint 41 is now active.
 

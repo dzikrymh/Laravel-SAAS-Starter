@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import AdminLayout from '@/layouts/admin-layout';
+import { formatCurrency } from '@/lib/format-currency';
 import { Head, Link, router } from '@inertiajs/react';
 import {
     Activity,
@@ -163,14 +164,6 @@ export default function AdminDashboard({
             };
         })
         .reverse(); // Reverse to show chronological order left-to-right
-
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-        }).format(value);
-    };
 
     const formatDuration = (seconds: number) => {
         if (seconds <= 0) {

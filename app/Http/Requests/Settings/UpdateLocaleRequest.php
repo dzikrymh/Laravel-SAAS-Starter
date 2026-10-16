@@ -4,6 +4,7 @@ namespace App\Http\Requests\Settings;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateLocaleRequest extends FormRequest
 {
@@ -23,7 +24,7 @@ class UpdateLocaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'locale' => ['required', 'string', 'in:en,fr,es,ar'],
+            'locale' => ['required', 'string', Rule::in(config('app.supported_locales'))],
         ];
     }
 }

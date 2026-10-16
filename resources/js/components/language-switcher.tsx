@@ -20,6 +20,7 @@ const languages = [
     { code: 'fr', label: 'Français' },
     { code: 'es', label: 'Español' },
     { code: 'ar', label: 'العربية' },
+    { code: 'id', label: 'Indonesia' },
 ];
 
 export function LanguageSwitcher({
