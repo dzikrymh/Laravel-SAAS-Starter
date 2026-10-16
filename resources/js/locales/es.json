@@ -316,5 +316,19 @@
     "feedback.experience.skip": "Quizás más tarde",
     "feedback.experience.submit": "Enviar comentarios",
     "feedback.experience.rating_required": "Selecciona una valoración.",
-    "feedback.experience.error": "Algo salió mal. Inténtalo de nuevo."
+    "feedback.experience.error": "Algo salió mal. Inténtalo de nuevo.",
+    "upgrade_modal.title": "Has alcanzado el límite de tu plan",
+    "upgrade_modal.description": "Tu plan {{plan}} incluye hasta {{limit}} {{resource}}.",
+    "upgrade_modal.resources.team_members": "miembros del equipo",
+    "upgrade_modal.resources.api_keys": "claves API",
+    "upgrade_modal.resources.webhooks": "webhooks",
+    "upgrade_modal.unlimited": "Ilimitado",
+    "upgrade_modal.current_plan": "Plan actual",
+    "upgrade_modal.next_plan": "Con {{plan}}",
+    "upgrade_modal.highest_plan": "Ya tienes el plan más alto. Contacta con soporte si necesitas un límite mayor.",
+    "upgrade_modal.ask_owner": "Pide a un propietario del espacio de trabajo o al responsable de facturación que mejore el plan.",
+    "upgrade_modal.dismiss": "Ahora no",
+    "upgrade_modal.compare_plans": "Comparar planes",
+    "upgrade_modal.upgrade_to": "Mejorar a {{plan}}",
+    "upgrade_modal.upgrade_error": "No se pudo iniciar la mejora. Inténtalo de nuevo."
 }

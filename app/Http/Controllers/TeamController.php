@@ -93,8 +93,7 @@ class TeamController extends Controller
         ]);
 
         if (! $this->invitationService->canInvite($workspace)) {
-            return redirect()->back()
-                ->with('error', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
+            return $this->planLimitReached($workspace, $user, 'team_members', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
         }
 
         try {

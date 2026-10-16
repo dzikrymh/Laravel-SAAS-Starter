@@ -316,5 +316,19 @@
     "feedback.experience.skip": "ربما لاحقًا",
     "feedback.experience.submit": "إرسال الملاحظات",
     "feedback.experience.rating_required": "يرجى اختيار تقييم.",
-    "feedback.experience.error": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    "feedback.experience.error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "upgrade_modal.title": "لقد وصلت إلى حد خطتك",
+    "upgrade_modal.description": "تتضمن خطة {{plan}} الخاصة بك ما يصل إلى {{limit}} {{resource}}.",
+    "upgrade_modal.resources.team_members": "أعضاء الفريق",
+    "upgrade_modal.resources.api_keys": "مفاتيح API",
+    "upgrade_modal.resources.webhooks": "خطافات الويب",
+    "upgrade_modal.unlimited": "غير محدود",
+    "upgrade_modal.current_plan": "الخطة الحالية",
+    "upgrade_modal.next_plan": "مع {{plan}}",
+    "upgrade_modal.highest_plan": "أنت على أعلى خطة. تواصل مع الدعم إذا كنت بحاجة إلى حد أعلى.",
+    "upgrade_modal.ask_owner": "اطلب من مالك مساحة العمل أو مسؤول الفوترة ترقية الخطة.",
+    "upgrade_modal.dismiss": "ليس الآن",
+    "upgrade_modal.compare_plans": "مقارنة الخطط",
+    "upgrade_modal.upgrade_to": "الترقية إلى {{plan}}",
+    "upgrade_modal.upgrade_error": "تعذر بدء الترقية. يرجى المحاولة مرة أخرى."
 }

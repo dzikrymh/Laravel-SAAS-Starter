@@ -23,7 +23,7 @@ class WorkspaceInviteLinkController extends Controller
         $workspace = $request->user()->currentWorkspace;
 
         if (! $this->invitationService->canInvite($workspace)) {
-            return back()->with('error', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
+            return $this->planLimitReached($workspace, $request->user(), 'team_members', 'You have reached your team member limit. Please upgrade your plan to invite more members.');
         }
 
         $expiresAt = $request->validated('expires_in_days')

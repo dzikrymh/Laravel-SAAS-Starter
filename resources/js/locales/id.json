@@ -316,5 +316,19 @@
     "feedback.experience.skip": "Nanti saja",
     "feedback.experience.submit": "Kirim masukan",
     "feedback.experience.rating_required": "Silakan pilih penilaian.",
-    "feedback.experience.error": "Terjadi kesalahan. Silakan coba lagi."
+    "feedback.experience.error": "Terjadi kesalahan. Silakan coba lagi.",
+    "upgrade_modal.title": "Anda telah mencapai batas paket",
+    "upgrade_modal.description": "Paket {{plan}} Anda mencakup hingga {{limit}} {{resource}}.",
+    "upgrade_modal.resources.team_members": "anggota tim",
+    "upgrade_modal.resources.api_keys": "kunci API",
+    "upgrade_modal.resources.webhooks": "webhook",
+    "upgrade_modal.unlimited": "Tanpa batas",
+    "upgrade_modal.current_plan": "Paket saat ini",
+    "upgrade_modal.next_plan": "Dengan {{plan}}",
+    "upgrade_modal.highest_plan": "Anda sudah menggunakan paket tertinggi. Hubungi dukungan jika Anda membutuhkan batas yang lebih tinggi.",
+    "upgrade_modal.ask_owner": "Minta pemilik workspace atau pengelola tagihan untuk meningkatkan paket.",
+    "upgrade_modal.dismiss": "Nanti saja",
+    "upgrade_modal.compare_plans": "Bandingkan paket",
+    "upgrade_modal.upgrade_to": "Tingkatkan ke {{plan}}",
+    "upgrade_modal.upgrade_error": "Tidak dapat memulai peningkatan. Silakan coba lagi."
 }

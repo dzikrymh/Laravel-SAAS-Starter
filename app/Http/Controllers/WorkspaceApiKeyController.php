@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WorkspaceApiKey;
+use App\Services\PlanLimitService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -46,11 +47,15 @@ class WorkspaceApiKeyController extends Controller
     /**
      * Create a new workspace API key.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, PlanLimitService $planLimitService): RedirectResponse
     {
         $user = $request->user();
         $workspace = $user->currentWorkspace;
         Gate::authorize('manageTeam', $workspace);
+
+        if (! $planLimitService->canCreateApiKey($workspace)) {
+            return $this->planLimitReached($workspace, $user, 'api_keys', 'You have reached your API key limit. Please upgrade your plan to create more API keys.');
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -64,7 +69,7 @@ class WorkspaceApiKeyController extends Controller
             $user,
             $validated['name'],
             $validated['scopes'],
-            $validated['expires_at'] ? new \DateTimeImmutable($validated['expires_at']) : null,
+            isset($validated['expires_at']) ? new \DateTimeImmutable($validated['expires_at']) : null,
         );
 
         return redirect()->back()->with('success', 'API key created.')->with('newKey', $result['plainTextKey']);

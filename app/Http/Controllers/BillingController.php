@@ -337,6 +337,7 @@ class BillingController extends Controller
                 'price' => $plan['price'],
                 'features' => $plan['features'],
                 'limits' => $plan['limits'],
+                'api_requests_per_minute' => $plan['api_requests_per_minute'],
                 'popular' => $plan['popular'] ?? false,
             ];
         })->values()->all();

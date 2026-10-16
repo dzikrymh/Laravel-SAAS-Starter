@@ -19,6 +19,7 @@ import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
 import http from '@/lib/http';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type Plan, type WorkspaceRole } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Check, HelpCircle, Minus } from 'lucide-react';
@@ -60,18 +61,51 @@ export default function ComparePlans({
         },
     ];
 
+    // Numeric plan limits, where -1 means unlimited
+    const limitRows: { label: string; value: (plan: Plan) => number }[] = [
+        {
+            label: t('billing.compare.limits.workspaces', 'Workspaces'),
+            value: (plan) => plan.limits.workspaces,
+        },
+        {
+            label: t('billing.compare.limits.team_members', 'Team Members'),
+            value: (plan) => plan.limits.team_members,
+        },
+        {
+            label: t('billing.compare.limits.api_keys', 'API Keys'),
+            value: (plan) => plan.limits.api_keys,
+        },
+        {
+            label: t('billing.compare.limits.webhooks', 'Webhooks'),
+            value: (plan) => plan.limits.webhooks,
+        },
+        {
+            label: t(
+                'billing.compare.limits.api_requests_per_minute',
+                'API Requests / min (per key)',
+            ),
+            value: (plan) => plan.api_requests_per_minute,
+        },
+    ];
+
+    // Features like "5 Workspaces" or "Unlimited Team Members" are already shown as limit rows
+    const isLimitFeature = (feature: string) =>
+        /^(\d[\d,]*|Unlimited)\s/.test(feature);
+
     // Build comparison matrix from plan features
     const buildComparisonMatrix = (): FeatureComparison[] => {
         const allFeatures = new Map<string, Set<string>>();
 
         // Collect all unique features across plans
         plans.forEach((plan) => {
-            plan.features.forEach((feature) => {
-                if (!allFeatures.has(feature)) {
-                    allFeatures.set(feature, new Set());
-                }
-                allFeatures.get(feature)?.add(plan.id);
-            });
+            plan.features
+                .filter((feature) => !isLimitFeature(feature))
+                .forEach((feature) => {
+                    if (!allFeatures.has(feature)) {
+                        allFeatures.set(feature, new Set());
+                    }
+                    allFeatures.get(feature)?.add(plan.id);
+                });
         });
 
         // Group features by category (simplified - in production, you'd have categories in the data)
@@ -236,70 +270,45 @@ export default function ComparePlans({
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {/* Plan Limits Row */}
-                                        <tr className="border-b bg-muted/5">
-                                            <td className="p-4 font-medium">
-                                                Team Members
-                                            </td>
-                                            {plans.map((plan) => (
-                                                <td
-                                                    key={plan.id}
-                                                    className="p-4 text-center"
-                                                >
-                                                    {plan.limits?.members ===
-                                                    -1 ? (
-                                                        <span className="font-bold text-primary">
-                                                            Unlimited
-                                                        </span>
-                                                    ) : (
-                                                        <span className="font-bold text-foreground">
-                                                            {plan.limits
-                                                                ?.members || 0}
-                                                        </span>
-                                                    )}
+                                        {/* Plan Limit Rows */}
+                                        {limitRows.map((row, idx) => (
+                                            <tr
+                                                key={row.label}
+                                                className={cn(
+                                                    'border-b',
+                                                    idx % 2 === 0 &&
+                                                        'bg-muted/5',
+                                                )}
+                                            >
+                                                <td className="p-4 font-medium">
+                                                    {row.label}
                                                 </td>
-                                            ))}
-                                        </tr>
-                                        <tr className="border-b">
-                                            <td className="p-4 font-medium">
-                                                Workspaces
-                                            </td>
-                                            {plans.map((plan) => (
-                                                <td
-                                                    key={plan.id}
-                                                    className="p-4 text-center"
-                                                >
-                                                    {plan.limits?.workspaces ===
-                                                    -1 ? (
-                                                        <span className="font-bold text-primary">
-                                                            Unlimited
-                                                        </span>
-                                                    ) : (
-                                                        <span className="font-bold text-foreground">
-                                                            {plan.limits
-                                                                ?.workspaces ||
-                                                                1}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            ))}
-                                        </tr>
-                                        <tr className="border-b bg-muted/5">
-                                            <td className="p-4 font-medium">
-                                                Storage
-                                            </td>
-                                            {plans.map((plan) => (
-                                                <td
-                                                    key={plan.id}
-                                                    className="p-4 text-center"
-                                                >
-                                                    <span className="font-bold text-foreground">
-                                                        {plan.limits?.storage ||
-                                                            '1GB'}
-                                                    </span>
-                                                </td>
-                                            ))}
-                                        </tr>
+                                                {plans.map((plan) => {
+                                                    const value =
+                                                        row.value(plan);
+
+                                                    return (
+                                                        <td
+                                                            key={plan.id}
+                                                            className="p-4 text-center"
+                                                        >
+                                                            {value === -1 ? (
+                                                                <span className="font-bold text-primary">
+                                                                    {t(
+                                                                        'upgrade_modal.unlimited',
+                                                                        'Unlimited',
+                                                                    )}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="font-bold text-foreground">
+                                                                    {value.toLocaleString()}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
 
                                         {/* Feature Rows */}
                                         {comparisonMatrix.map((category) =>

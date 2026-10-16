@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Workspace;
+use Illuminate\Support\Facades\Gate;
 
 class PlanLimitService
 {
@@ -102,6 +103,38 @@ class PlanLimitService
         }
 
         return $workspace->webhookEndpoints()->count() < $limits['webhooks'];
+    }
+
+    /**
+     * Describe a plan limit that blocked an action, for the frontend upgrade modal.
+     *
+     * @param  'team_members'|'api_keys'|'webhooks'  $resource
+     * @return array{resource: string, can_upgrade: bool, current_plan: array{key: string, name: string, limit: int}, next_plan: array{key: string, name: string, limit: int}|null}
+     */
+    public function limitReachedDetails(Workspace $workspace, string $resource, User $user): array
+    {
+        $planKeys = array_keys(config('billing.plans'));
+        $currentPlanKey = in_array($workspace->plan_key, $planKeys, true) ? $workspace->plan_key : 'free';
+        $nextPlanKey = $planKeys[array_search($currentPlanKey, $planKeys, true) + 1] ?? null;
+
+        return [
+            'resource' => $resource,
+            'can_upgrade' => $nextPlanKey !== null && Gate::forUser($user)->allows('manageBilling', $workspace),
+            'current_plan' => $this->planLimitSummary($currentPlanKey, $resource),
+            'next_plan' => $nextPlanKey ? $this->planLimitSummary($nextPlanKey, $resource) : null,
+        ];
+    }
+
+    /**
+     * @return array{key: string, name: string, limit: int}
+     */
+    protected function planLimitSummary(string $planKey, string $resource): array
+    {
+        return [
+            'key' => $planKey,
+            'name' => config("billing.plans.{$planKey}.name"),
+            'limit' => (int) config("billing.plans.{$planKey}.limits.{$resource}", 0),
+        ];
     }
 
     /**

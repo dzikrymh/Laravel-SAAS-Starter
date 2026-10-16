@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WebhookEndpoint;
 use App\Models\Workspace;
+use App\Services\PlanLimitService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -31,9 +32,13 @@ class WebhookEndpointController extends Controller
     /**
      * Store a newly created webhook.
      */
-    public function store(Request $request, Workspace $workspace): RedirectResponse
+    public function store(Request $request, Workspace $workspace, PlanLimitService $planLimitService): RedirectResponse
     {
         Gate::authorize('create', [WebhookEndpoint::class, $workspace]);
+
+        if (! $planLimitService->canCreateWebhook($workspace)) {
+            return $this->planLimitReached($workspace, $request->user(), 'webhooks', 'You have reached your webhook limit. Please upgrade your plan to create more webhooks.');
+        }
 
         $validated = $request->validate([
             'url' => ['required', 'url', 'max:255'],

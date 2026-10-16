@@ -86,9 +86,10 @@ export interface Plan {
     limits: {
         workspaces: number;
         team_members: number;
-        members?: number;
-        storage?: string | number;
+        api_keys: number;
+        webhooks: number;
     };
+    api_requests_per_minute: number;
     popular?: boolean;
 }
 
@@ -99,9 +100,24 @@ export interface Invoice {
     pdf_url: string;
 }
 
+export interface PlanLimitSummary {
+    key: string;
+    name: string;
+    /** -1 means unlimited. */
+    limit: number;
+}
+
+export interface PlanLimitReached {
+    resource: 'team_members' | 'api_keys' | 'webhooks';
+    can_upgrade: boolean;
+    current_plan: PlanLimitSummary;
+    next_plan: PlanLimitSummary | null;
+}
+
 export interface Flash {
     success?: string;
     error?: string;
+    plan_limit?: PlanLimitReached | null;
 }
 
 export interface SharedData {
