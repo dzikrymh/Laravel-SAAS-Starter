@@ -31,7 +31,7 @@ test('profile information can be updated with timezone and date format', functio
     $user->refresh();
 
     expect($user->name)->toBe('Test User')
-        ->and($user->email)->toBe('test@example.com')
+        ->and($user->pending_email)->toBe('test@example.com')
         ->and($user->timezone)->toBe('America/New_York')
         ->and($user->date_format)->toBe('d/m/Y');
 });

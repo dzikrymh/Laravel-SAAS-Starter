@@ -47,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     protected $fillable = [
         'name',
         'email',
+        'pending_email',
         'password',
         'is_superadmin',
         'current_workspace_id',

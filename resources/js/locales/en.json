@@ -329,5 +329,13 @@
     "plan_limit.unlimited": "Unlimited",
     "plan_limit.resources.team_members": "team members",
     "plan_limit.resources.api_keys": "API keys",
-    "plan_limit.resources.webhooks": "webhooks"
+    "plan_limit.resources.webhooks": "webhooks",
+    "settings.profile.pending_email": "Waiting for confirmation of {{email}}. Your current email stays active until you open the link we sent to that address.",
+    "settings.profile.resend_email_change": "Resend link",
+    "settings.profile.cancel_email_change": "Cancel change",
+    "settings.profile.email_change_link_sent": "A confirmation link has been sent to {{email}}.",
+    "settings.profile.email_change_cancelled": "The email change was cancelled.",
+    "settings.profile.email_changed": "Your email address has been updated.",
+    "settings.profile.email_change_link_invalid": "This confirmation link is no longer valid. Request a new one.",
+    "settings.profile.email_change_email_taken": "That email address is already used by another account."
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Http\Requests\Settings\UpdateLocaleRequest;
+use App\Services\EmailChangeService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class ProfileController extends Controller
 
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+            'pendingEmail' => $user->pending_email,
             'status' => $request->session()->get('status'),
             'loginStreak' => [
                 'current' => $user->currentLoginStreak(),
@@ -35,22 +37,18 @@ class ProfileController extends Controller
     /**
      * Update the user's profile settings.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, EmailChangeService $emailChangeService): RedirectResponse
     {
         $user = $request->user();
         $validated = $request->validated();
 
+        // The email only changes once the new address is confirmed through EmailChangeService
         $user->fill([
             'name' => $validated['name'],
-            'email' => $validated['email'],
             'bio' => $validated['bio'] ?? null,
             'timezone' => $validated['timezone'],
             'date_format' => $validated['date_format'],
         ]);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
 
         if ($request->hasFile('avatar')) {
             if ($user->getRawOriginal('avatar_url')) {
@@ -63,6 +61,12 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        if ($validated['email'] !== $user->email) {
+            $emailChangeService->request($user, $validated['email']);
+
+            return to_route('profile.edit')->with('status', 'email-change-requested');
+        }
 
         return to_route('profile.edit');
     }

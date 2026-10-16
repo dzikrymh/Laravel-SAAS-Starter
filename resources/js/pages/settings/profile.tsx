@@ -31,16 +31,59 @@ import {
     destroy as destroyAvatar,
     update as updateAvatar,
 } from '@/routes/profile/avatar';
+import {
+    destroy as cancelEmailChange,
+    resend as resendEmailChange,
+} from '@/routes/profile/email';
+
+const EMAIL_CHANGE_SUCCESS_STATUSES = [
+    'email-change-requested',
+    'email-change-link-sent',
+    'email-change-cancelled',
+    'email-changed',
+];
 
 export default function Profile({
     mustVerifyEmail,
+    pendingEmail,
     status,
 }: {
     mustVerifyEmail: boolean;
+    pendingEmail: string | null;
     status?: string;
 }) {
     const { auth, locale } = usePage<SharedData>().props;
     const { t } = useTranslations();
+
+    const emailChangeMessages: Record<string, string> = {
+        'email-change-requested': t(
+            'settings.profile.email_change_link_sent',
+            'A confirmation link has been sent to {{email}}.',
+            { email: pendingEmail },
+        ),
+        'email-change-link-sent': t(
+            'settings.profile.email_change_link_sent',
+            'A confirmation link has been sent to {{email}}.',
+            { email: pendingEmail },
+        ),
+        'email-change-cancelled': t(
+            'settings.profile.email_change_cancelled',
+            'The email change was cancelled.',
+        ),
+        'email-changed': t(
+            'settings.profile.email_changed',
+            'Your email address has been updated.',
+        ),
+        'email-change-link-invalid': t(
+            'settings.profile.email_change_link_invalid',
+            'This confirmation link is no longer valid. Request a new one.',
+        ),
+        'email-change-email-taken': t(
+            'settings.profile.email_change_email_taken',
+            'That email address is already used by another account.',
+        ),
+    };
+    const emailChangeMessage = status ? emailChangeMessages[status] : undefined;
     // const [removeAvatar, setRemoveAvatar] = useState(false); // No longer needed as handled by AvatarUpload sub-requests
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -125,6 +168,7 @@ export default function Profile({
                                     </Label>
 
                                     <Input
+                                        key={pendingEmail ?? 'no-pending-email'}
                                         id="email"
                                         type="email"
                                         className="mt-1 block w-full"
@@ -142,6 +186,56 @@ export default function Profile({
                                         className="mt-2"
                                         message={errors.email}
                                     />
+
+                                    {pendingEmail && (
+                                        <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-700 dark:bg-amber-950/30">
+                                            <p className="text-amber-800 dark:text-amber-300">
+                                                {t(
+                                                    'settings.profile.pending_email',
+                                                    'Waiting for confirmation of {{email}}. Your current email stays active until you open the link we sent to that address.',
+                                                    { email: pendingEmail },
+                                                )}
+                                            </p>
+                                            <div className="mt-2 flex gap-4">
+                                                <Link
+                                                    href={resendEmailChange()}
+                                                    as="button"
+                                                    preserveScroll
+                                                    className="font-medium text-amber-800 underline underline-offset-4 dark:text-amber-300"
+                                                >
+                                                    {t(
+                                                        'settings.profile.resend_email_change',
+                                                        'Resend link',
+                                                    )}
+                                                </Link>
+                                                <Link
+                                                    href={cancelEmailChange()}
+                                                    as="button"
+                                                    preserveScroll
+                                                    className="font-medium text-amber-800 underline underline-offset-4 dark:text-amber-300"
+                                                >
+                                                    {t(
+                                                        'settings.profile.cancel_email_change',
+                                                        'Cancel change',
+                                                    )}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {emailChangeMessage && (
+                                        <p
+                                            className={
+                                                EMAIL_CHANGE_SUCCESS_STATUSES.includes(
+                                                    status ?? '',
+                                                )
+                                                    ? 'text-sm font-medium text-green-600'
+                                                    : 'text-sm font-medium text-destructive'
+                                            }
+                                        >
+                                            {emailChangeMessage}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid gap-2">

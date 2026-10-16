@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\ConnectedAccountController;
+use App\Http\Controllers\Settings\EmailChangeController;
 use App\Http\Controllers\Settings\LoginActivityController;
 use App\Http\Controllers\Settings\NotificationPreferenceController;
 use App\Http\Controllers\Settings\PasswordController;
@@ -24,6 +25,16 @@ Route::middleware('auth')->group(function () {
     Route::post('settings/profile/avatar', [UserAvatarController::class, 'update'])->name('profile.avatar.update');
     Route::delete('settings/profile/avatar', [UserAvatarController::class, 'destroy'])->name('profile.avatar.destroy');
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Email change re-verification
+    Route::get('settings/profile/email/verify/{id}/{hash}', [EmailChangeController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->whereNumber('id')
+        ->name('profile.email.verify');
+    Route::post('settings/profile/email/resend', [EmailChangeController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('profile.email.resend');
+    Route::delete('settings/profile/email', [EmailChangeController::class, 'destroy'])->name('profile.email.destroy');
 
     // Password management (API endpoint for the authentication page)
     Route::put('settings/password', [PasswordController::class, 'update'])

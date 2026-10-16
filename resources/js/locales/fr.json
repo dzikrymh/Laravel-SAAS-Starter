@@ -329,5 +329,13 @@
     "plan_limit.unlimited": "Illimité",
     "plan_limit.resources.team_members": "membres de l'équipe",
     "plan_limit.resources.api_keys": "clés API",
-    "plan_limit.resources.webhooks": "webhooks"
+    "plan_limit.resources.webhooks": "webhooks",
+    "settings.profile.pending_email": "En attente de confirmation de {{email}}. Votre adresse actuelle reste active jusqu’à ce que vous ouvriez le lien envoyé à cette adresse.",
+    "settings.profile.resend_email_change": "Renvoyer le lien",
+    "settings.profile.cancel_email_change": "Annuler le changement",
+    "settings.profile.email_change_link_sent": "Un lien de confirmation a été envoyé à {{email}}.",
+    "settings.profile.email_change_cancelled": "Le changement d’adresse e-mail a été annulé.",
+    "settings.profile.email_changed": "Votre adresse e-mail a été mise à jour.",
+    "settings.profile.email_change_link_invalid": "Ce lien de confirmation n’est plus valide. Demandez-en un nouveau.",
+    "settings.profile.email_change_email_taken": "Cette adresse e-mail est déjà utilisée par un autre compte."
 }

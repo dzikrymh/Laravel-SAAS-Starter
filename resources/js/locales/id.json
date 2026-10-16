@@ -329,5 +329,13 @@
     "plan_limit.unlimited": "Tanpa batas",
     "plan_limit.resources.team_members": "anggota tim",
     "plan_limit.resources.api_keys": "kunci API",
-    "plan_limit.resources.webhooks": "webhook"
+    "plan_limit.resources.webhooks": "webhook",
+    "settings.profile.pending_email": "Menunggu konfirmasi untuk {{email}}. Email Anda saat ini tetap aktif sampai Anda membuka link yang kami kirim ke alamat tersebut.",
+    "settings.profile.resend_email_change": "Kirim ulang link",
+    "settings.profile.cancel_email_change": "Batalkan perubahan",
+    "settings.profile.email_change_link_sent": "Link konfirmasi telah dikirim ke {{email}}.",
+    "settings.profile.email_change_cancelled": "Perubahan email dibatalkan.",
+    "settings.profile.email_changed": "Alamat email Anda telah diperbarui.",
+    "settings.profile.email_change_link_invalid": "Link konfirmasi ini sudah tidak berlaku. Silakan minta link baru.",
+    "settings.profile.email_change_email_taken": "Alamat email tersebut sudah digunakan oleh akun lain."
 }

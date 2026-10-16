@@ -329,5 +329,13 @@
     "plan_limit.unlimited": "غير محدود",
     "plan_limit.resources.team_members": "أعضاء الفريق",
     "plan_limit.resources.api_keys": "مفاتيح API",
-    "plan_limit.resources.webhooks": "خطافات الويب"
+    "plan_limit.resources.webhooks": "خطافات الويب",
+    "settings.profile.pending_email": "في انتظار تأكيد {{email}}. يظل بريدك الإلكتروني الحالي نشطًا حتى تفتح الرابط الذي أرسلناه إلى هذا العنوان.",
+    "settings.profile.resend_email_change": "إعادة إرسال الرابط",
+    "settings.profile.cancel_email_change": "إلغاء التغيير",
+    "settings.profile.email_change_link_sent": "تم إرسال رابط التأكيد إلى {{email}}.",
+    "settings.profile.email_change_cancelled": "تم إلغاء تغيير البريد الإلكتروني.",
+    "settings.profile.email_changed": "تم تحديث عنوان بريدك الإلكتروني.",
+    "settings.profile.email_change_link_invalid": "رابط التأكيد هذا لم يعد صالحًا. اطلب رابطًا جديدًا.",
+    "settings.profile.email_change_email_taken": "عنوان البريد الإلكتروني هذا مستخدم بالفعل من قبل حساب آخر."
 }

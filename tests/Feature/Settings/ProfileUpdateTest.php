@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
@@ -13,7 +14,9 @@ test('profile page is displayed', function () {
 });
 
 test('profile information can be updated', function () {
+    Notification::fake();
     $user = User::factory()->create();
+    $originalEmail = $user->email;
 
     $response = $this
         ->actingAs($user)
@@ -31,8 +34,9 @@ test('profile information can be updated', function () {
     $user->refresh();
 
     expect($user->name)->toBe('Test User');
-    expect($user->email)->toBe('test@example.com');
-    expect($user->email_verified_at)->toBeNull();
+    expect($user->email)->toBe($originalEmail);
+    expect($user->pending_email)->toBe('test@example.com');
+    expect($user->email_verified_at)->not->toBeNull();
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {

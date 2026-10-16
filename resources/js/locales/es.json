@@ -329,5 +329,13 @@
     "plan_limit.unlimited": "Ilimitado",
     "plan_limit.resources.team_members": "miembros del equipo",
     "plan_limit.resources.api_keys": "claves API",
-    "plan_limit.resources.webhooks": "webhooks"
+    "plan_limit.resources.webhooks": "webhooks",
+    "settings.profile.pending_email": "Esperando la confirmación de {{email}}. Tu correo actual sigue activo hasta que abras el enlace que enviamos a esa dirección.",
+    "settings.profile.resend_email_change": "Reenviar enlace",
+    "settings.profile.cancel_email_change": "Cancelar cambio",
+    "settings.profile.email_change_link_sent": "Se ha enviado un enlace de confirmación a {{email}}.",
+    "settings.profile.email_change_cancelled": "Se canceló el cambio de correo.",
+    "settings.profile.email_changed": "Tu dirección de correo se ha actualizado.",
+    "settings.profile.email_change_link_invalid": "Este enlace de confirmación ya no es válido. Solicita uno nuevo.",
+    "settings.profile.email_change_email_taken": "Esa dirección de correo ya la usa otra cuenta."
 }
