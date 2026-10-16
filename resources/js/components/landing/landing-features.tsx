@@ -135,7 +135,7 @@ export function LandingFeatures() {
             title: t('landing.features.items.stack.title', 'Modern Stack'),
             description: t(
                 'landing.features.items.stack.description',
-                'Laravel 12, Inertia.js v2, React 19, and Tailwind CSS v4 for a blazing-fast developer experience.',
+                'Laravel 13, Inertia.js v3, React 19, and Tailwind CSS v4 for a blazing-fast developer experience.',
             ),
             color: 'text-yellow-500',
             bgColor: 'bg-yellow-500/10',

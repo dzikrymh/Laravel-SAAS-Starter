@@ -25,4 +25,4 @@ The session management page displays all active browser sessions with device inf
 ### Requirements
 
 - Session driver must be set to `database` (`SESSION_DRIVER=database` in `.env`)
-- The `sessions` database table must exist (included by default in Laravel 12)
+- The `sessions` database table must exist (included in the default Laravel migrations)

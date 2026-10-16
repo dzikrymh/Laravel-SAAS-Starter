@@ -24,7 +24,7 @@ export function LandingFaq() {
             ),
             answer: t(
                 'landing.faq.items.tech_stack.answer',
-                'Laravel SAAS Starter is built with Laravel 12, Inertia.js v2, React 19, and Tailwind CSS v4. It uses Laravel Fortify for authentication, Laravel Cashier for Stripe billing, and shadcn/ui-inspired components for the UI.',
+                'Laravel SAAS Starter is built with Laravel 13, Inertia.js v3, React 19, and Tailwind CSS v4. It uses Laravel Fortify for authentication, Laravel Cashier for Stripe billing, and shadcn/ui-inspired components for the UI.',
             ),
         },
         {

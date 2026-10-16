@@ -13,8 +13,8 @@
 
 1. **Don't Ask Redundant Questions:** Never ask for permission to proceed to the next feature. Just outline what you are building and build it.
 2. **Tech Stack Consistency:**
-   - Backend: Laravel 12, standard PHP 8.4 typing, Pest for all testing.
-   - Frontend: Inertia v2 (+ React 19), Tailwind CSS v4.
+   - Backend: Laravel 13, standard PHP 8.4 typing, Pest v4 for all testing.
+   - Frontend: Inertia v3 (+ React 19), Tailwind CSS v4.
    - Database: Always write raw SQLite-compatible migrations unless absolutely necessary.
    - Integrations: Stripe (Cashier), Sentry, Socialite.
 3. **Pest Testing:** Every feature MUST be backed by Pest feature/unit tests. Run the test suite (`php artisan test --compact`) constantly.

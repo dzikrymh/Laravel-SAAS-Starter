@@ -22,10 +22,8 @@
 - **🚩 Feature Flags (Pennant)** - Database-driven feature flagging with targeted, workspace-specific rollout mechanisms.
 - **📜 System Audit Logs** - Complete change history and system-wide visibility via Spatie Activitylog tracking.
 - **🌙 Elegant UI Components** - Beautiful React 19 light/dark themes powered by Shadcn/UI and smooth Tailwind CSS v4 styling.
-- **🏷️ Custom Fields & Tags** - Extensible workspace metadata with custom field definitions, tagging system, and color-coded labels.
-- **📋 Workspace Templates** - Save and reuse workspace configurations for rapid setup of new workspaces.
 - **💬 Workspace Comments & Announcements** - Collaborative commenting on activities and internal workspace announcements.
-- **⚡ Modern Architecture** - Laravel 12 + Inertia.js v2, strictly typed via Pest tests (1,400+ tests out-of-the-box).
+- **⚡ Modern Architecture** - Laravel 13 + Inertia.js v3, strictly typed via Pest tests (1,500+ tests out-of-the-box).
 
 ## 📋 Requirements
 
@@ -135,8 +133,8 @@ php artisan test tests/Feature/Auth/LoginTest.php
 
 ## 📚 Tech Stack
 
-- **Backend**: Laravel 12
-- **Frontend**: React 19 with Inertia.js v2
+- **Backend**: Laravel 13 (PHP 8.4)
+- **Frontend**: React 19 with Inertia.js v3
 - **Styling**: Tailwind CSS v4
 - **Authentication**: Laravel Fortify
 - **Billing**: Laravel Cashier (Stripe)
@@ -159,7 +157,7 @@ For a comprehensive review of the project's internal architecture, component str
 [Admin Panel](./docs/features/admin-panel.md) | [Impersonation](./docs/features/impersonation.md) | [System Health](./docs/features/system-health.md) | [Scheduled Tasks](./docs/features/scheduled-tasks.md) | [Data Retention](./docs/features/data-retention.md) | [SEO Management](./docs/features/seo-management.md)
 
 **Platform Features**
-[Global Announcements](./docs/features/global-announcements.md) | [Feature Flags](./docs/features/feature-flags.md) | [Audit Logs](./docs/features/audit-logs.md) | [Changelog](./docs/features/changelog.md) | [Email Templates](./docs/features/email-templates.md) | [Webhooks](./docs/features/webhooks.md) | [Real-time Notifications](./docs/features/real-time-notifications.md) | [Feedback](./docs/features/feedback.md) | [Onboarding Checklist](./docs/features/onboarding-checklist.md) | [Advanced Search](./docs/features/advanced-search.md) | [Custom Fields](./docs/features/custom-fields.md) | [Workspace Tags](./docs/features/workspace-tags.md) | [Workspace Templates](./docs/features/workspace-templates.md) | [Workspace Comments](./docs/features/workspace-comments.md) | [Workspace Announcements](./docs/features/workspace-announcements.md) | [Activity Reactions](./docs/features/activity-reactions.md) | [Public Status Page](./docs/features/public-status-page.md)
+[Global Announcements](./docs/features/global-announcements.md) | [Feature Flags](./docs/features/feature-flags.md) | [Audit Logs](./docs/features/audit-logs.md) | [Changelog](./docs/features/changelog.md) | [Email Templates](./docs/features/email-templates.md) | [Webhooks](./docs/features/webhooks.md) | [Real-time Notifications](./docs/features/real-time-notifications.md) | [Feedback](./docs/features/feedback.md) | [Onboarding Checklist](./docs/features/onboarding-checklist.md) | [Advanced Search](./docs/features/advanced-search.md) | [Workspace Comments](./docs/features/workspace-comments.md) | [Workspace Announcements](./docs/features/workspace-announcements.md) | [Activity Reactions](./docs/features/activity-reactions.md) | [Public Status Page](./docs/features/public-status-page.md)
 
 **Security & Compliance**
 [2FA Enforcement](./docs/features/2fa-enforcement.md) | [GDPR Data Export](./docs/features/gdpr-data-export.md) | [Account Deletion](./docs/features/account-deletion.md) | [Security](./docs/features/security.md) | [Connected Accounts](./docs/features/connected-accounts.md)
@@ -184,7 +182,7 @@ For a comprehensive review of the project's internal architecture, component str
 │   │   ├── components/    # Reusable shadcn/ui & generic ui components
 │   │   ├── layouts/       # Strict domain boundaries (admin vs customer ui)
 │   │   └── pages/         # Inertia frontend pages
-└── tests/                 # Standardized Pest tests (1,400+ available)
+└── tests/                 # Standardized Pest tests (1,500+ available)
 ```
 
 ## 🔧 Configuration
@@ -232,7 +230,7 @@ Add new languages by:
 
 ### GitHub Actions Workflows
 
-- `tests.yml`: runs Pest test suite on PHP 8.2, 8.3, and 8.4
+- `tests.yml`: runs Pest test suite on PHP 8.4
 - `lint.yml`: runs Laravel Pint, Prettier check, and ESLint
 - `dependency-audit.yml`: runs `composer audit` and `npm audit --audit-level=high`
 - `codeql.yml`: performs CodeQL static analysis for PHP and JavaScript/TypeScript

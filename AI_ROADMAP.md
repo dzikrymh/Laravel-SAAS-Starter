@@ -20,33 +20,62 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 
 ## 📌 Current State
 
-- **Stack**: Laravel 12, Inertia.js v2, React 19, Tailwind CSS v4, Stripe Cashier, Fortify.
-- **Completed Features**: Auth, 2FA, Workspaces, Teams, Stripe Billing, i18n, Dark Mode, Super Admin Panel, Feature Flags (Pennant), Announcements, Audit Logs, Command Palette.
+- **Stack**: Laravel 13, Inertia.js v3, React 19, Tailwind CSS v4, Stripe Cashier v16, Fortify.
+- **Completed Features**: Auth (2FA, Passkeys, Magic Link, Social Login), Workspaces, Teams, Stripe Billing (seats, invoices, cancellation flow), i18n (en/es/fr/ar), Dark Mode, Super Admin Panel, Feature Flags (Pennant), Announcements, Audit Logs, Command Palette, Webhooks, Workspace API Keys, Status Page, Support Tickets.
+- **Known Gaps** (addressed by Sprints 41–46): no dunning flow, no coupons/promo codes, no tax ID collection, no Bahasa Indonesia locale, no local payment gateway (QRIS/VA/e-wallet), SSO still "Coming Soon" in `config/billing.php`, no SCIM, no metered billing, no referral program, no email-change re-verification, no versioned ToS acceptance, no automated backups.
 
-## 🚀 Active Sprint 30: Engagement & Observability
+> ⚠️ **Dependency rule:** Tasks marked **[needs approval]** add a new Composer/NPM package or require a business decision. Per `CLAUDE.md`, do NOT install dependencies without user approval — stop and ask before starting those tasks, then continue with the next unblocked task.
 
-- [x] **Task 123**: In-App Changelog Widget — `changelog_read_at` on users, `ChangelogWidgetController` (index + mark-read), `ChangelogWidget` popover component with unread badge, mounted in app header. ✅ (9 tests, 20 assertions)
-- [x] **Task 124**: Workspace Activity Feed — `WorkspaceActivityController::feed()` at `GET /workspace-activity-feed` returns last 5 workspace activities as JSON, `WorkspaceActivityFeed` card widget mounted on dashboard with loading skeleton and empty state. ✅ (8 tests, 25 assertions)
-- [x] **Task 125**: Admin Revenue Export CSV — `RevenueAnalyticsController::export()` at `GET /admin/revenue-analytics/export` streams CSV with workspace name, plan, billing interval, status, MRR, quantity, dates. Export CSV button added to revenue analytics page. ✅ (7 tests, 17 assertions)
-- [x] **Task 126**: Webhook Signature Verification Guide — `WebhookEndpointController::verificationGuide()` at `GET /workspaces/{workspace}/webhooks/verification-guide`, Inertia page with step-by-step explanation, PHP/Node.js/Python code samples with copy buttons, link from webhooks index. ✅ (6 tests, 41 assertions)
-- [x] **Task 127**: User Profile Completeness Score — `User::profileCompletenessScore()` checks avatar, bio, non-UTC timezone, 2FA (4 checks × 25 pts each), shared as `auth.user.profile_completeness` via Inertia middleware, progress bar card on profile settings page when < 100%. ✅ (8 tests, 29 assertions)
+## 🚀 Active Sprint 41: Revenue Recovery & Promotions
 
-## 🚀 Active Sprint 36: Developer Experience & Admin Power Tools
+- [ ] **Task 174**: Dunning Flow — When a subscription enters `past_due` (`StripeWebhookController`), show a persistent in-app banner to workspace owners/billing managers with an "Update Payment Method" CTA (Stripe billing portal). `app:send-dunning-reminders` command sends staged emails on day 1/3/7, deduplicated via `billing_reminder_logs`. Configurable grace period in `config/billing.php`; after it ends, auto-suspend via the existing workspace suspension flow (Task 73) and auto-restore on `invoice.paid`.
+- [ ] **Task 175**: Coupons & Promotion Codes — Promo code input on plan subscribe/checkout using Cashier `withPromotionCode()`; `POST /billing/promotion-codes/validate` endpoint returning discount preview; show the active discount on the billing page; admin page at `/admin/promotion-codes` to list/create/deactivate Stripe promotion codes.
+- [ ] **Task 176**: Pause Subscription — Backend for the "pause" retention option already offered in `CancellationFlow` (Task 165): pause via Stripe `pause_collection` (1/2/3 months), resume endpoint, "Paused until …" state on billing page, and paused workspaces fall back to Free plan limits through `PlanLimitService`.
+- [ ] **Task 177**: Tax ID & Billing Address — Collect billing address + tax IDs (VAT, NPWP) on the billing page via Cashier `createTaxId()` / `taxIds()`; tax IDs shown on invoice PDFs; opt-in Stripe Tax via `Cashier::calculateTaxes()` behind a config flag.
 
-- [x] **Task 153**: Workspace API Key Last Used Timestamp — `last_used_at` column + `recordUsage()` were pre-existing; enhanced display from absolute date to `formatDistanceToNow()` relative time on API keys page. ✅ (4 tests, 34 assertions)
-- [x] **Task 154**: Admin Impersonation Audit Log — `ImpersonationController::impersonate()` now logs Spatie activity entry (event=`impersonated`, causer=admin, subject=target); `GET /admin/users/{user}` show page with impersonation history + activity log; "View Detail" added to admin users dropdown. ✅ (5 tests, 40 assertions)
-- [x] **Task 155**: Workspace Onboarding Progress Bar — `WorkspaceController::computeOnboardingProgress()` computes 5-step score (has_logo, has_members, has_webhook, has_api_key, owner_has_2fa); `onboardingProgress` prop in `settings()` Inertia response; progress bar card with step checklist on workspace settings page (hidden when 100%). ✅ (6 tests, 69 assertions)
-- [x] **Task 156**: Super Admin Quick Stats Widget — `DashboardController::quickStats()` at `GET /admin/quick-stats` returns JSON (total_users, total_workspaces, mrr); `AdminQuickStatsWidget` fetches and renders a compact 3-column stat bar in the admin sidebar footer with loading skeleton. ✅ (4 tests, 10 assertions)
-- [x] **Task 157**: User Last Seen Timestamp — Track `last_seen_at` on users (updated on each authenticated web request via middleware); display in admin user list and workspace team member list. ✅ (6 tests, 34 assertions)
-- [x] **Task 158**: User Login Methods Summary — `SecuritySummaryController` at `GET /settings/security-summary` returns JSON with password status, 2FA status, connected social accounts, security score (0-100), and recommendations; `SecuritySummaryCard` React component displays on profile settings with visual indicators and quick action links. ✅ (12 tests, 48 assertions)
-- [x] **Task 159**: Session Activity Summary — `SessionSummaryController` at `GET /settings/session-summary` returns session count, current device info, and other sessions summary; `SessionSummaryCard` component on profile settings shows active sessions with "Sign Out All Other Devices" action; integrates with existing `SessionController` revoke functionality. ✅ (8 tests, 24 assertions)
+## 📋 Planned Sprint 42: Indonesian Market Launch
 
-## 🚀 Active Sprint 40: Advanced Workspace Features & Automation
+- [ ] **Task 178**: Bahasa Indonesia Locale — Add `lang/id.json` + `lang/id/*` with full coverage of existing `en` keys; add `id` to the locale switcher and `SetLocale` allowed list; add a Pest test asserting every `en` key exists in `id`; IDR currency + `id-ID` date formatting helpers on the frontend.
+- [ ] **Task 179**: Payment Gateway Abstraction — Introduce a `PaymentGateway` contract so Stripe and a local provider can coexist; per-workspace `payment_provider` column; `BillingController` routes subscribe/cancel/invoice actions through the contract. Stripe remains the default implementation; no behaviour change for existing workspaces.
+- [ ] **Task 180**: Local Payment Gateway **[needs approval: provider choice (Xendit vs Midtrans) + SDK package]** — QRIS, Virtual Account, and e-wallet payments; recurring billing via scheduled invoices + payment links; webhook endpoint with signature verification; payment status synced to the subscription/workspace state; reuse dunning reminders from Task 174.
+- [ ] **Task 181**: PPN-Compliant Invoices — Configurable PPN rate in `config/billing.php`, NPWP and company name on IDR invoices, invoice numbering sequence per workspace, PDF layout with tax breakdown (DPP, PPN, total).
 
-- [x] **Task 170**: Workspace Templates — Template system for rapid workspace creation. `WorkspaceTemplate` model with JSON configuration storage. `WorkspaceTemplateController` with index/store/show/update/destroy/use/duplicate endpoints. `WorkspaceTemplateService` extracts configuration from source workspaces and applies to new workspaces. Supports public/private templates, categories, and usage tracking. 12 Pest tests. ✅
+## 📋 Planned Sprint 43: Enterprise Identity & Compliance
+
+- [ ] **Task 182**: Workspace SSO (SAML 2.0 / OIDC) **[needs approval: SAML package]** — Per-workspace IdP configuration (metadata URL/XML, certificate, attribute mapping), SP-initiated login at `/sso/{workspace}`, JIT user provisioning, optional "enforce SSO" toggle in workspace security settings; gated to Business plan; replace "SSO (Coming Soon)" in `config/billing.php`.
+- [ ] **Task 183**: Domain Verification & Auto-Join — Builds on `allowed_email_domains` (Task 108): DNS TXT verification for workspace domains, verified domains let new users with matching emails auto-join (or request to join) the workspace on registration.
+- [ ] **Task 184**: SCIM 2.0 Provisioning — `/scim/v2/Users` and `/scim/v2/Groups` endpoints (list/create/update/deactivate) authenticated with a scoped workspace API key (`scim` scope); deactivation removes workspace membership and revokes sessions.
+- [ ] **Task 185**: Audit Log Streaming — Workspace-level destinations (S3 bucket or HTTPS endpoint) receiving activity log batches via a queued job every 5 minutes; delivery status + last error in workspace settings.
+- [ ] **Task 186**: Custom Domain per Workspace — Extends Workspace Custom Branding (Task 58): workspace owners map `app.theircompany.com` via CNAME, DNS verification, request routing middleware resolving workspace by host, branded login page on the custom domain.
+
+## 📋 Planned Sprint 44: Monetization Expansion
+
+- [ ] **Task 187**: Metered Usage Billing — Report usage (API requests from `api_request_logs`, AI tokens) to Stripe Meters via a scheduled job; metered price items per plan in `config/billing.php`; current-period usage + projected cost on the usage dashboard.
+- [ ] **Task 188**: Plan Add-ons — Purchasable add-ons (extra seats, extra API keys, extra storage) as additional subscription items; `PlanLimitService` adds add-on quantities to base limits; add-on management card on billing page.
+- [ ] **Task 189**: Plan Versioning (Grandfathering) — `plan_version` on subscriptions; legacy price IDs kept in `config/billing.php`; existing subscribers keep their price when plans change; admin view showing subscribers per plan version with an optional migrate action.
+- [ ] **Task 190**: Contextual Upgrade Modal — When a `PlanLimitService` check blocks an action (invite, API key, webhook), return a structured error that opens an upgrade modal showing the limit hit, the next plan's limit, and a one-click upgrade CTA.
+
+## 📋 Planned Sprint 45: Growth & Trust
+
+- [ ] **Task 191**: Referral Program — Unique referral link per user, `referrals` table tracking signup → paid conversion, reward as Stripe customer balance credit for the referrer, referral stats card in settings, admin referral report.
+- [ ] **Task 192**: Public Roadmap & Feature Voting — Extends the `Feedback` model: admin promotes feedback to roadmap items (planned/in progress/shipped), public `/roadmap` page with upvotes (one per user), voters notified when an item ships (links to changelog entry).
+- [ ] **Task 193**: Email Change Re-Verification — Changing email stores `pending_email` and sends a signed verification link to the new address plus a security notice to the old address; email only switches after verification; pending state + cancel action on profile page.
+- [ ] **Task 194**: Versioned Terms & Privacy Acceptance — `legal_documents` (type, version, published_at) and `legal_acceptances` (user, document version, IP, timestamp); acceptance checkbox on registration; middleware forcing re-acceptance when a new version is published (UU PDP / GDPR audit trail); admin page to publish new versions.
+
+## 📋 Planned Sprint 46: Operational Resilience
+
+- [ ] **Task 195**: Automated Backups **[needs approval: `spatie/laravel-backup`]** — Daily database + storage backups to a configurable disk, retention policy, backup status/last run/size on the admin System Health page, failure notification to superadmins.
+- [ ] **Task 196**: Queue Monitoring **[needs approval: `laravel/horizon` + Redis]** — Horizon dashboard behind superadmin gate, or (if not approved) extend System Health with per-queue throughput, wait time, and long-wait alerts.
+- [ ] **Task 197**: Per-Plan API Rate Limits — Move API rate limits into plan config, `RateLimiter` keyed by workspace API key and plan, `X-RateLimit-*` headers, limits shown on API usage dashboard.
+
+## 🏁 Completed Sprint 40: Advanced Workspace Features & Automation
+
+> ⚠️ Tasks 170, 172, and 173 were later **removed** in commit `9f7ace8` ("cleanup restyle", 2026-04-04), which also added a migration dropping their tables. Only Task 171 remains in the codebase. Do not reintroduce them unless the user asks.
+
+- [x] **Task 170**: Workspace Templates — 🗑️ Removed in `9f7ace8`. Was: template system for rapid workspace creation (`WorkspaceTemplate` model, controller, service).
 - [x] **Task 171**: Advanced Workspace Search — Unified search across workspace content. `WorkspaceSearchController` searches activities, comments, announcements, and members. Faceted results with type filtering. Suggestions endpoint for autocomplete. 5 Pest tests. ✅
-- [x] **Task 172**: Workspace Tags/Labels — Polymorphic tagging system with `tags` and `taggables` tables. Color-coded labels with preset palette. `TagController` with CRUD, attach/detach, and available tags endpoints. Global and workspace-specific tags supported. 13 Pest tests. ✅
-- [x] **Task 173**: Custom Workspace Fields — Extensible custom field system with `custom_field_definitions` and `custom_field_values` tables. Supports 7 field types: text, textarea, number, date, boolean, select, url. Field validation, type casting, and reordering. 12 Pest tests. ✅
+- [x] **Task 172**: Workspace Tags/Labels — 🗑️ Removed in `9f7ace8`. Was: polymorphic tagging system with color-coded labels.
+- [x] **Task 173**: Custom Workspace Fields — 🗑️ Removed in `9f7ace8`. Was: extensible custom field system with 7 field types.
 
 ## 🏁 Completed Sprint 39: Team Collaboration & Communication
 
@@ -66,6 +95,16 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - [x] **Task 160**: Profile Settings Reorganization — Reorganized profile settings from 11 flat items into 4 logical sections (Profile, Security, Privacy, Support). Merged Password + 2FA into combined "Authentication" page. Moved Appearance (theme toggle) into General/Profile page. Renamed "Privacy & Cookies" to "Cookies". Moved Security Summary and Session Summary cards from Profile to Authentication page for better logical grouping. Updated all layouts (profile-layout.tsx, workspace-layout.tsx) with new navigation structure. Added redirects for backward compatibility. ✅
 - [x] **Task 161**: Workspace Settings Menu Enhancement — Added "Workspace Settings" link to main sidebar for quick access. Improved workspace settings layout organization with consistent icons for all menu items. Added test users (superadmin, admin, demo) as admins to "Startup Hub" workspace in seeder for full feature testing. ✅
 - [x] **Task 162**: Settings Menu Navigation Fixes — Fixed user menu dropdown to have clear separation between "Workspace Settings" and "Profile Settings". Removed redundant menu items. Ensured all menu items have proper icons. ✅
+
+## 🏁 Completed Sprint 36: Developer Experience & Admin Power Tools
+
+- [x] **Task 153**: Workspace API Key Last Used Timestamp — `last_used_at` column + `recordUsage()` were pre-existing; enhanced display from absolute date to `formatDistanceToNow()` relative time on API keys page. ✅ (4 tests, 34 assertions)
+- [x] **Task 154**: Admin Impersonation Audit Log — `ImpersonationController::impersonate()` now logs Spatie activity entry (event=`impersonated`, causer=admin, subject=target); `GET /admin/users/{user}` show page with impersonation history + activity log; "View Detail" added to admin users dropdown. ✅ (5 tests, 40 assertions)
+- [x] **Task 155**: Workspace Onboarding Progress Bar — `WorkspaceController::computeOnboardingProgress()` computes 5-step score (has_logo, has_members, has_webhook, has_api_key, owner_has_2fa); `onboardingProgress` prop in `settings()` Inertia response; progress bar card with step checklist on workspace settings page (hidden when 100%). ✅ (6 tests, 69 assertions)
+- [x] **Task 156**: Super Admin Quick Stats Widget — `DashboardController::quickStats()` at `GET /admin/quick-stats` returns JSON (total_users, total_workspaces, mrr); `AdminQuickStatsWidget` fetches and renders a compact 3-column stat bar in the admin sidebar footer with loading skeleton. ✅ (4 tests, 10 assertions)
+- [x] **Task 157**: User Last Seen Timestamp — Track `last_seen_at` on users (updated on each authenticated web request via middleware); display in admin user list and workspace team member list. ✅ (6 tests, 34 assertions)
+- [x] **Task 158**: User Login Methods Summary — `SecuritySummaryController` at `GET /settings/security-summary` returns JSON with password status, 2FA status, connected social accounts, security score (0-100), and recommendations; `SecuritySummaryCard` React component displays on profile settings with visual indicators and quick action links. ✅ (12 tests, 48 assertions)
+- [x] **Task 159**: Session Activity Summary — `SessionSummaryController` at `GET /settings/session-summary` returns session count, current device info, and other sessions summary; `SessionSummaryCard` component on profile settings shows active sessions with "Sign Out All Other Devices" action; integrates with existing `SessionController` revoke functionality. ✅ (8 tests, 24 assertions)
 
 ## 🏁 Completed Sprint 35: Security, Observability & Quality-of-Life
 
@@ -106,6 +145,14 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - [x] **Task 130**: Workspace Danger Zone — `WorkspaceController::dangerZone()` + `leave()`, `GET /settings/workspace-danger-zone` page with delete workspace (owners, name-confirm guard), leave workspace (non-owners, confirm step), transfer ownership link, personal workspace notice. "Danger Zone" added to settings sidebar. ✅ (10 tests, 52 assertions)
 - [x] **Task 131**: Global Search (Admin) — `AdminSearchController::search()` at `GET /admin/search?q=`, returns users (name/email match), workspaces (name/slug match), subscriptions (owner/status/price match), max 5 per category. `AdminSearchBar` component with debounce + click-outside dismiss mounted in admin sidebar. ✅ (10 tests, 24 assertions)
 - [x] **Task 132**: Notification Digest Preview Command — `app:preview-weekly-digest {workspace}` Artisan command, accepts workspace ID or slug, prints subject, greeting, email body lines, action button, and stats summary (members, delta, activity count) to terminal without sending. ✅ (6 tests, 12 assertions)
+
+## 🏁 Completed Sprint 30: Engagement & Observability
+
+- [x] **Task 123**: In-App Changelog Widget — `changelog_read_at` on users, `ChangelogWidgetController` (index + mark-read), `ChangelogWidget` popover component with unread badge, mounted in app header. ✅ (9 tests, 20 assertions)
+- [x] **Task 124**: Workspace Activity Feed — `WorkspaceActivityController::feed()` at `GET /workspace-activity-feed` returns last 5 workspace activities as JSON, `WorkspaceActivityFeed` card widget mounted on dashboard with loading skeleton and empty state. ✅ (8 tests, 25 assertions)
+- [x] **Task 125**: Admin Revenue Export CSV — `RevenueAnalyticsController::export()` at `GET /admin/revenue-analytics/export` streams CSV with workspace name, plan, billing interval, status, MRR, quantity, dates. Export CSV button added to revenue analytics page. ✅ (7 tests, 17 assertions)
+- [x] **Task 126**: Webhook Signature Verification Guide — `WebhookEndpointController::verificationGuide()` at `GET /workspaces/{workspace}/webhooks/verification-guide`, Inertia page with step-by-step explanation, PHP/Node.js/Python code samples with copy buttons, link from webhooks index. ✅ (6 tests, 41 assertions)
+- [x] **Task 127**: User Profile Completeness Score — `User::profileCompletenessScore()` checks avatar, bio, non-UTC timezone, 2FA (4 checks × 25 pts each), shared as `auth.user.profile_completeness` via Inertia middleware, progress bar card on profile settings page when < 100%. ✅ (8 tests, 29 assertions)
 
 ## 🏁 Completed Sprint 29: User Trust & Admin Control
 
@@ -173,6 +220,10 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - **Sprint 12**: Enterprise Mechanics (Seat-Based Billing, Data Retention, 2FA Enforcement).
 
 ## 📝 Changelog
+
+- **2026-10-16**: Roadmap reorganization. Closed out Sprints 30, 36, and 40 (all tasks complete) and moved them to Completed. Noted that Sprint 40 Tasks 170/172/173 (Templates, Tags, Custom Fields) were removed in `9f7ace8`; only Task 171 (Search) remains. Updated Current State to the installed stack (Laravel 13, Inertia v3). Planned Sprints 41–46 (Tasks 174–197): revenue recovery & promotions, Indonesian market launch, enterprise identity, monetization expansion, growth & trust, operational resilience. Sprint 41 is now active.
+
+- **2026-10-15 → 2026-10-16** (out-of-sprint): Passkey authentication support (`d8fca4a`); password confirmation for passwordless users via `RequirePasswordUnlessPasswordless` middleware with updated security recommendations (`d150461`); auth forms migrated to Inertia `<Form>`, 2FA routes renamed, unused connected-accounts routes removed (`5161ef4`).
 
 - **2026-03-23**: Sprint 40 (Advanced Workspace Features): Task 170 (Workspace Templates) — template system for rapid workspace creation with JSON configuration, public/private visibility, categories. Task 171 (Advanced Search) — unified search across activities, comments, announcements, members with faceted results. Task 172 (Workspace Tags) — color-coded labels with polymorphic tagging system. Task 173 (Custom Fields) — extensible field system with 7 field types, validation, and reordering. 42 Pest tests with 91 assertions. ✅
 

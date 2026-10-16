@@ -92,7 +92,7 @@ This repository contains comprehensive documentation for the architecture, featu
 
 ### Tech Stack
 
-- Frontend: React 19, Inertia v2, Tailwind CSS v4, shadcn/ui
-- Backend: Laravel 12, standard PHP 8.4 typing
+- Frontend: React 19, Inertia v3, Tailwind CSS v4, shadcn/ui
+- Backend: Laravel 13, standard PHP 8.4 typing
 - Database: SQLite (default), MySQL, PostgreSQL compatible
 - Testing: Pest (Feature & Browser Testing)

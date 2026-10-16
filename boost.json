@@ -8,6 +8,7 @@
         "opencode",
         "phpstorm"
     ],
+    "cloud": false,
     "editors": [
         "claude_code",
         "codex",
@@ -17,12 +18,9 @@
         "phpstorm",
         "vscode"
     ],
-    "guidelines": [
-        "laravel/fortify",
-        "inertiajs/inertia-laravel",
-        "laravel/ai",
-        "laravel/octane",
+    "guidelines": true,
+    "herd_mcp": true,
+    "packages": [
         "spatie/boost-spatie-guidelines"
-    ],
-    "herd_mcp": true
+    ]
 }
