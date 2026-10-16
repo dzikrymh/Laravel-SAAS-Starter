@@ -17,12 +17,13 @@ Route::get('/user', function (Request $request) {
 |
 | These routes are authenticated using the wsk_ workspace API keys
 | generated in the workspace settings. Each route requires the
-| api-key middleware with the appropriate scope.
+| api-key middleware with the appropriate scope, followed by the
+| per-plan workspace-api rate limiter keyed by that API key.
 |
 */
 use App\Http\Controllers\Api\V1\WorkspaceController;
 
-Route::prefix('v1')->middleware('api-key:read')->group(function () {
+Route::prefix('v1')->middleware(['api-key:read', 'throttle:workspace-api'])->group(function () {
     Route::get('/workspace', [WorkspaceController::class, 'show']);
     Route::get('/members', [WorkspaceController::class, 'members']);
 });

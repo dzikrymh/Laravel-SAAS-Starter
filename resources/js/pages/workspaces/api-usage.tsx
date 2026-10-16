@@ -55,6 +55,10 @@ interface ApiUsageProps {
     perKeyUsage: PerKeyUsageItem[];
     statusDistribution: Record<string, number>;
     topEndpoints: TopEndpointItem[];
+    rateLimit: {
+        requestsPerMinute: number;
+        planName: string;
+    };
     period: string;
 }
 
@@ -92,6 +96,7 @@ export default function ApiUsage({
     perKeyUsage,
     statusDistribution,
     topEndpoints,
+    rateLimit,
     period,
 }: ApiUsageProps) {
     const { t } = useTranslations();
@@ -211,9 +216,14 @@ export default function ApiUsage({
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     {t(
-                                        'api_usage.rate_limited_requests',
-                                        'Rate-limited requests',
-                                    )}
+                                        'api_usage.rate_limit_per_key',
+                                        'Limit: {limit} req/min per key ({plan} plan)',
+                                    )
+                                        .replace(
+                                            '{limit}',
+                                            rateLimit.requestsPerMinute.toLocaleString(),
+                                        )
+                                        .replace('{plan}', rateLimit.planName)}
                                 </p>
                             </CardContent>
                         </Card>

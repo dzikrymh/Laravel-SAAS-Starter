@@ -14,8 +14,10 @@ use App\Listeners\LogSuccessfulLogin;
 use App\Listeners\LogWebhookCall;
 use App\Models\FeatureFlag;
 use App\Models\Workspace;
+use App\Models\WorkspaceApiKey;
 use App\Observers\ActivityLogObserver;
 use App\Policies\WorkspacePolicy;
+use App\Services\PlanLimitService;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -107,6 +109,19 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('invitations', function (Request $request) {
             return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('workspace-api', function (Request $request) {
+            $apiKey = $request->attributes->get('api_key');
+
+            if (! $apiKey instanceof WorkspaceApiKey) {
+                return Limit::perMinute(config('billing.plans.free.api_requests_per_minute', 60))->by($request->ip());
+            }
+
+            $workspace = $apiKey->workspace;
+
+            return Limit::perMinute(app(PlanLimitService::class)->getApiRequestsPerMinute($workspace))
+                ->by("workspace-api:{$apiKey->id}:{$workspace->plan_key}");
         });
 
         self::registerFeatureFlags();

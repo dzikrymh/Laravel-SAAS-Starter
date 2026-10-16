@@ -8,7 +8,7 @@ The API Usage Dashboard provides workspace owners and admins with comprehensive 
 ### Overview Statistics
 - **Total Requests**: Count of all API requests within the selected period
 - **Average Response Time**: Mean response time in milliseconds across all endpoints
-- **Throttled Requests**: Number of rate-limited (429) responses
+- **Throttled Requests**: Number of rate-limited (429) responses, plus the workspace plan's per-key rate limit
 - **Error Rate**: Percentage of 4xx and 5xx responses
 
 ### Request Volume Chart
@@ -46,6 +46,17 @@ API requests are automatically logged by the `AuthenticateApiKey` middleware. Ea
 - Request timestamp
 
 Failed authentication attempts (invalid key, expired key, insufficient scope) are **not** logged.
+
+### Rate Limiting
+The `/api/v1` routes use the `throttle:workspace-api` limiter (`AppServiceProvider`), which runs after `AuthenticateApiKey` so throttled requests are still logged. Each API key gets its own bucket sized by the workspace plan's `api_requests_per_minute` in `config/billing.php`:
+
+| Plan | Requests per minute (per key) |
+|------|-------------------------------|
+| Free | 60 |
+| Pro | 300 |
+| Business | 1000 |
+
+Responses include `X-RateLimit-Limit` and `X-RateLimit-Remaining`; throttled responses return `429` JSON with `Retry-After` and `X-RateLimit-Reset`.
 
 ### Database Schema
 The `api_request_logs` table stores individual request records with indexes optimized for:

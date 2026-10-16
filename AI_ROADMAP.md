@@ -31,7 +31,7 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 > Low-risk tasks pulled forward from Sprints 42–45: no new dependencies, no approvals, and each builds on existing code. Revenue Recovery & Promotions moves to Sprint 41b.
 
 - [x] **Task 178**: Bahasa Indonesia Locale — `lang/id.json` (329 keys), `lang/id/notifications.php`, and `resources/js/locales/id.json` (318 keys) with full `en` coverage. Supported locales centralized in `config('app.supported_locales')`, used by `SetLocale` and `UpdateLocaleRequest`; `id` added to i18next and the language switcher. New `formatCurrency()` helper (`resources/js/lib/format-currency.ts`, whole-unit IDR); `id-ID` dates already handled by `formatDate()`. `TranslationParityTest` checks key parity for every locale and placeholder preservation for `id`. ✅
-- [ ] **Task 197**: Per-Plan API Rate Limits — Move API rate limits into plan config, `RateLimiter` keyed by workspace API key and plan, `X-RateLimit-*` headers, limits shown on API usage dashboard.
+- [x] **Task 197**: Per-Plan API Rate Limits — `/api/v1` routes previously had no rate limiting. Added `api_requests_per_minute` per plan in `config/billing.php` (Free 60 / Pro 300 / Business 1000), `PlanLimitService::getApiRequestsPerMinute()`, and a `workspace-api` limiter keyed by API key + plan. `AuthenticateApiKey` is prepended before `ThrottleRequests` in the middleware priority list so the limiter sees the key and 429s are logged as `was_throttled`. `api/*` errors always render as JSON. Limit shown on the API usage dashboard. 8 Pest tests. ✅
 - [ ] **Task 190**: Contextual Upgrade Modal — When a `PlanLimitService` check blocks an action (invite, API key, webhook), return a structured error that opens an upgrade modal showing the limit hit, the next plan's limit, and a one-click upgrade CTA.
 - [ ] **Task 193**: Email Change Re-Verification — Changing email stores `pending_email` and sends a signed verification link to the new address plus a security notice to the old address; email only switches after verification; pending state + cancel action on profile page.
 - [ ] **Task 176**: Pause Subscription — Backend for the "pause" retention option already offered in `CancellationFlow` (Task 165): pause via Stripe `pause_collection` (1/2/3 months), resume endpoint, "Paused until …" state on billing page, and paused workspaces fall back to Free plan limits through `PlanLimitService`.
@@ -225,6 +225,8 @@ The AI agent is now continually managing and executing the roadmap autonomously.
 - **Sprint 12**: Enterprise Mechanics (Seat-Based Billing, Data Retention, 2FA Enforcement).
 
 ## 📝 Changelog
+
+- **2026-10-16**: Task 197 (Per-Plan API Rate Limits) complete — per-plan, per-key `workspace-api` limiter on `/api/v1` with `X-RateLimit-*` headers, JSON 429s logged as throttled, limit shown on the API usage dashboard. ✅
 
 - **2026-10-16**: Sprint 41 replaced with a "Quick Wins" sprint (Tasks 178, 197, 190, 193, 176) pulled forward from later sprints; Revenue Recovery & Promotions moved to Sprint 41b. Task 178 (Bahasa Indonesia Locale) complete — backend/frontend/notification translations, centralized `app.supported_locales`, `formatCurrency()` helper, `TranslationParityTest`. ✅
 

@@ -105,6 +105,15 @@ class PlanLimitService
     }
 
     /**
+     * Get the number of API requests per minute each of the workspace's API keys may make.
+     */
+    public function getApiRequestsPerMinute(Workspace $workspace): int
+    {
+        return config("billing.plans.{$workspace->plan_key}.api_requests_per_minute")
+            ?? config('billing.plans.free.api_requests_per_minute', 60);
+    }
+
+    /**
      * Get a human-readable message about workspace limits.
      */
     public function getWorkspaceLimitMessage(User $user): string

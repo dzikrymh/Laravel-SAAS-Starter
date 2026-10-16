@@ -59,10 +59,8 @@ it('allows bypass with secret cookie during maintenance mode', function () {
     // Put the app in maintenance mode
     Artisan::call('down', ['--with-secret' => true]);
 
-    // Extract the secret from the storage
-    $maintenanceFile = storage_path('framework/down');
-    $data = json_decode(file_get_contents($maintenanceFile), true);
-    $secret = $data['secret'] ?? null;
+    // Extract the secret from the maintenance mode payload
+    $secret = app()->maintenanceMode()->data()['secret'] ?? null;
 
     expect($secret)->not->toBeNull();
 

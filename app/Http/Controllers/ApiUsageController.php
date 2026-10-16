@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApiRequestLog;
+use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class ApiUsageController extends Controller
     /**
      * Display the API usage dashboard for the current workspace.
      */
-    public function index(Request $request): Response
+    public function index(Request $request, PlanLimitService $planLimitService): Response
     {
         $user = $request->user();
         $workspace = $user->currentWorkspace;
@@ -125,6 +126,10 @@ class ApiUsageController extends Controller
             'perKeyUsage' => $perKeyUsage,
             'statusDistribution' => $statusDistribution,
             'topEndpoints' => $topEndpoints,
+            'rateLimit' => [
+                'requestsPerMinute' => $planLimitService->getApiRequestsPerMinute($workspace),
+                'planName' => $workspace->plan_name,
+            ],
             'period' => (string) $periodDays,
         ]);
     }

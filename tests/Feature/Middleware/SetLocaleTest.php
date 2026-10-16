@@ -4,6 +4,7 @@ use App\Http\Middleware\SetLocale;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 it('sets locale from authenticated user preference', function () {
@@ -73,3 +74,18 @@ it('accepts all supported locales', function (string $locale) {
 
     expect(App::getLocale())->toBe($locale);
 })->with(['en', 'es', 'fr', 'ar', 'id']);
+
+it('does not log guest session data', function () {
+    Log::spy();
+    Session::put('locale', 'es');
+
+    $middleware = new SetLocale;
+    $request = Request::create('/test');
+    $request->setUserResolver(fn () => null);
+
+    $middleware->handle($request, function () {
+        return response('ok');
+    });
+
+    Log::shouldNotHaveReceived('info');
+});

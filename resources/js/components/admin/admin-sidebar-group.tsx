@@ -36,27 +36,20 @@ export function AdminSidebarGroup({
 
     const isFeatureEnabled = useFeature;
 
-    // Auto-expand if current route is in this group
-    useEffect(() => {
-        const isActiveInGroup = items.some(
-            (item) =>
-                currentPath === item.href ||
-                currentPath.startsWith(item.href + '/'),
-        );
-        if (isActiveInGroup && !isExpanded) {
-            setIsExpanded(true);
-        }
-    }, [currentPath, items, isExpanded]);
+    // Always show the group expanded when the current route is in it
+    const isActiveInGroup = items.some(
+        (item) =>
+            currentPath === item.href ||
+            currentPath.startsWith(item.href + '/'),
+    );
+    const isOpen = isExpanded || isActiveInGroup;
 
     // Save state to localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            localStorage.setItem(
-                `admin-sidebar-${storageKey}`,
-                String(isExpanded),
-            );
+            localStorage.setItem(`admin-sidebar-${storageKey}`, String(isOpen));
         }
-    }, [isExpanded, storageKey]);
+    }, [isOpen, storageKey]);
 
     // Filter items by feature flag
     const visibleItems = items.filter((item) => {
@@ -76,7 +69,7 @@ export function AdminSidebarGroup({
     return (
         <div className="mb-2">
             <button
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={() => setIsExpanded(!isOpen)}
                 className={cn(
                     'flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     isGroupActive
@@ -91,7 +84,7 @@ export function AdminSidebarGroup({
                 <ChevronDown
                     className={cn(
                         'size-4 transition-transform duration-200',
-                        isExpanded ? 'rotate-0' : '-rotate-90',
+                        isOpen ? 'rotate-0' : '-rotate-90',
                     )}
                 />
             </button>
@@ -99,9 +92,7 @@ export function AdminSidebarGroup({
             <div
                 className={cn(
                     'overflow-hidden transition-all duration-200 ease-in-out',
-                    isExpanded
-                        ? 'mt-1 max-h-96 opacity-100'
-                        : 'max-h-0 opacity-0',
+                    isOpen ? 'mt-1 max-h-96 opacity-100' : 'max-h-0 opacity-0',
                 )}
             >
                 <div className="ml-3 flex flex-col gap-0.5 border-l border-sidebar-border/50 pl-4">

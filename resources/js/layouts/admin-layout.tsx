@@ -50,26 +50,31 @@ interface QuickStats {
 
 function AdminQuickStatsWidget() {
     const [stats, setStats] = useState<QuickStats | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const fetchStats = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('/admin/quick-stats', {
+    const loadStats = useCallback(
+        () =>
+            fetch('/admin/quick-stats', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setStats(data);
-            }
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+            })
+                .then((res) => (res.ok ? res.json() : null))
+                .then((data: QuickStats | null) => {
+                    if (data) {
+                        setStats(data);
+                    }
+                })
+                .finally(() => setLoading(false)),
+        [],
+    );
+
+    const refreshStats = () => {
+        setLoading(true);
+        loadStats();
+    };
 
     useEffect(() => {
-        fetchStats();
-    }, [fetchStats]);
+        loadStats();
+    }, [loadStats]);
 
     if (!stats) {
         return (
@@ -105,7 +110,7 @@ function AdminQuickStatsWidget() {
     return (
         <div className="relative rounded-md border border-sidebar-border bg-sidebar-accent/20 p-2">
             <button
-                onClick={fetchStats}
+                onClick={refreshStats}
                 disabled={loading}
                 className="absolute top-1 right-1 rounded p-1 transition-colors hover:bg-sidebar-accent/50"
                 title="Refresh stats"

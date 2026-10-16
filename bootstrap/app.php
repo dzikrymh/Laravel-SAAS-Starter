@@ -22,6 +22,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Inertia\Inertia;
 use Sentry\Laravel\Integration;
 
@@ -74,9 +75,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.confirm' => RequirePasswordUnlessPasswordless::class,
             'api-key' => AuthenticateApiKey::class,
         ]);
+
+        // The workspace-api rate limiter keys on the API key resolved by AuthenticateApiKey.
+        $middleware->prependToPriorityList(
+            before: ThrottleRequests::class,
+            prepend: AuthenticateApiKey::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         Integration::handles($exceptions);
+
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson()
+        );
 
         $exceptions->respond(function (mixed $response, Throwable $e, Request $request) {
             $status = $response->getStatusCode();

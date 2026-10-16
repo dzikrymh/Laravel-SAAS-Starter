@@ -13,6 +13,9 @@ return [
     | Note: The 'stripe_price_id' values should be replaced with your actual
     | Stripe Price IDs from your Stripe Dashboard.
     |
+    | 'api_requests_per_minute' is the rate limit applied to each workspace
+    | API key on the `/api/v1` routes.
+    |
     */
 
     'plans' => [
@@ -33,6 +36,7 @@ return [
                 'api_keys' => 2,
                 'webhooks' => 1,
             ],
+            'api_requests_per_minute' => 60,
             'features' => [
                 '1 Workspace',
                 '2 Team Members',
@@ -58,9 +62,11 @@ return [
                 'api_keys' => 10,
                 'webhooks' => 5,
             ],
+            'api_requests_per_minute' => 300,
             'features' => [
                 '5 Workspaces',
                 '10 Team Members',
+                '300 API requests/min',
                 'All Features',
                 'Priority Support',
                 'Advanced Analytics',
@@ -85,9 +91,11 @@ return [
                 'api_keys' => -1, // Unlimited
                 'webhooks' => -1, // Unlimited
             ],
+            'api_requests_per_minute' => 1000,
             'features' => [
                 'Unlimited Workspaces',
                 'Unlimited Team Members',
+                '1000 API requests/min',
                 'All Features',
                 'Dedicated Support',
                 'Advanced Analytics',
