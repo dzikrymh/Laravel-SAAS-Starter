@@ -5,6 +5,8 @@ import {
     LandingFooter,
     LandingHeader,
     LandingHero,
+    LandingMarquee,
+    LandingPlatform,
     LandingPricing,
     LandingTestimonials,
 } from '@/components/landing';
@@ -70,17 +72,14 @@ export default function Welcome({
                         'Production-ready Laravel SaaS starter kit by XCO Agency.',
                     )}
                 />
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800"
-                    rel="stylesheet"
-                />
             </Head>
 
-            <div className="min-h-screen bg-background text-foreground">
+            <div className="min-h-screen overflow-x-clip bg-background text-foreground">
                 <LandingHeader canRegister={canRegister} />
                 <main>
                     <LandingHero />
+                    <LandingMarquee />
+                    <LandingPlatform />
                     <LandingFeatures />
                     <LandingPricing />
                     <LandingTestimonials />

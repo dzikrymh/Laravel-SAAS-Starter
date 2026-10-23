@@ -53,7 +53,7 @@ export default function MagicLink({ status }: { status?: string }) {
 
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="h-12 w-full text-[15px] transition-[translate,box-shadow] hover:-translate-y-px hover:shadow-[0_10px_26px_-10px_var(--primary)]"
                         size="lg"
                         tabIndex={2}
                         disabled={processing}
@@ -67,7 +67,7 @@ export default function MagicLink({ status }: { status?: string }) {
                     <TextLink
                         href="/login"
                         tabIndex={3}
-                        className="font-semibold"
+                        className="font-semibold text-highlight no-underline hover:underline"
                     >
                         Back to password login
                     </TextLink>

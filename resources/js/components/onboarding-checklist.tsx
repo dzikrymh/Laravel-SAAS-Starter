@@ -1,16 +1,9 @@
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useTranslations } from '@/hooks/use-translations';
 import http from '@/lib/http';
 import { Link } from '@inertiajs/react';
-import { CheckCircle2, Circle, Sparkles, X } from 'lucide-react';
+import { Check, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ChecklistStep {
@@ -69,82 +62,87 @@ export function OnboardingChecklist() {
     const allComplete = data.completed === data.total;
 
     return (
-        <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/5">
-            <div className="absolute top-0 right-0 h-32 w-32 translate-x-8 -translate-y-8 transform">
-                <div className="h-full w-full rounded-full bg-primary/5" />
-            </div>
-            <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-lg">
+        <section
+            aria-labelledby="onboarding-checklist-title"
+            className="flex animate-rise flex-col gap-4 rounded-2xl border bg-card p-[22px] [animation-delay:0.05s]"
+        >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-foreground">
+                        <Sparkles className="size-[18px]" />
+                    </span>
+                    <div className="flex flex-col gap-1">
+                        <h2
+                            id="onboarding-checklist-title"
+                            className="text-[17px] font-bold"
+                        >
                             {t('onboarding.checklist.title', 'Get started')}
-                        </CardTitle>
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            {allComplete
+                                ? t(
+                                      'onboarding.checklist.complete',
+                                      "You're all set! Your workspace is fully configured.",
+                                  )
+                                : t(
+                                      'onboarding.checklist.description',
+                                      'Complete these steps to get the most out of your workspace.',
+                                  )}
+                        </p>
                     </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-semibold text-muted-foreground tabular-nums">
+                        {data.completed}/{data.total}
+                    </span>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        className="size-9 text-muted-foreground hover:text-foreground"
                         onClick={dismiss}
                         disabled={dismissing}
                     >
-                        <X className="h-4 w-4" />
+                        <X className="size-4" />
                         <span className="sr-only">Dismiss</span>
                     </Button>
                 </div>
-                <CardDescription>
-                    {allComplete
-                        ? t(
-                              'onboarding.checklist.complete',
-                              "You're all set! Your workspace is fully configured.",
-                          )
-                        : t(
-                              'onboarding.checklist.description',
-                              'Complete these steps to get the most out of your workspace.',
-                          )}
-                </CardDescription>
-                <div className="flex items-center gap-3 pt-2">
-                    <Progress value={progress} className="h-2 flex-1" />
-                    <span className="text-sm font-medium text-muted-foreground">
-                        {data.completed}/{data.total}
-                    </span>
-                </div>
-            </CardHeader>
-            <CardContent className="pb-4">
-                <div className="space-y-3">
-                    {data.steps.map((step) => (
-                        <Link
-                            key={step.id}
-                            href={step.href}
-                            className={`flex items-center gap-3 rounded-lg border p-3 transition-all hover:bg-muted/50 ${
-                                step.completed
-                                    ? 'border-primary/20 bg-primary/5'
-                                    : 'border-border hover:border-primary/30'
-                            }`}
-                        >
-                            {step.completed ? (
-                                <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
-                            ) : (
-                                <Circle className="h-5 w-5 shrink-0 text-muted-foreground" />
-                            )}
-                            <div className="min-w-0 flex-1">
-                                <p
-                                    className={`text-sm font-medium ${
-                                        step.completed
-                                            ? 'text-muted-foreground line-through'
-                                            : 'text-foreground'
-                                    }`}
-                                >
-                                    {step.label}
-                                </p>
-                                <p className="truncate text-xs text-muted-foreground">
-                                    {step.description}
-                                </p>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+            </div>
+
+            <Progress value={progress} className="h-1.5" />
+
+            <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+                {data.steps.map((step) => (
+                    <Link
+                        key={step.id}
+                        href={step.href}
+                        className={`flex min-h-16 items-start gap-3 rounded-xl border p-3.5 transition-colors hover:border-primary ${
+                            step.completed ? 'bg-muted' : 'bg-card'
+                        }`}
+                    >
+                        {step.completed ? (
+                            <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <Check className="size-3" strokeWidth={3} />
+                            </span>
+                        ) : (
+                            <span className="size-[22px] shrink-0 rounded-full border-2" />
+                        )}
+                        <span className="flex min-w-0 flex-col gap-0.5">
+                            <span
+                                className={`text-sm font-semibold ${
+                                    step.completed
+                                        ? 'text-muted-foreground line-through'
+                                        : ''
+                                }`}
+                            >
+                                {step.label}
+                            </span>
+                            <span className="text-[13px] text-muted-foreground">
+                                {step.description}
+                            </span>
+                        </span>
+                    </Link>
+                ))}
+            </div>
+        </section>
     );
 }

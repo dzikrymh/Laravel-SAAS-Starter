@@ -142,7 +142,7 @@ export default function Register({ email, redirect }: RegisterProps) {
 
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="h-12 w-full text-[15px] transition-[translate,box-shadow] hover:-translate-y-px hover:shadow-[0_10px_26px_-10px_var(--primary)]"
                                 size="lg"
                                 tabIndex={5}
                                 data-test="register-user-button"
@@ -157,13 +157,19 @@ export default function Register({ email, redirect }: RegisterProps) {
                             <TextLink
                                 href={loginUrl()}
                                 tabIndex={6}
-                                className="font-semibold"
+                                className="font-semibold text-highlight no-underline hover:underline"
                             >
                                 {t('auth.log_in', 'Sign in')}
                             </TextLink>
                         </div>
 
-                        <SocialLoginButtons />
+                        <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                            <span className="h-px flex-1 bg-border" />
+                            {t('auth.continue_with', 'Or continue with')}
+                            <span className="h-px flex-1 bg-border" />
+                        </div>
+
+                        <SocialLoginButtons showDivider={false}/>
                     </>
                 )}
             </Form>

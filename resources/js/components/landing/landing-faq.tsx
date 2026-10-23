@@ -1,10 +1,11 @@
 import { useTranslations } from '@/hooks/use-translations';
-import { ChevronDown } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { Reveal } from './reveal';
 
 export function LandingFaq() {
     const { t } = useTranslations();
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     const faqs = [
         {
@@ -80,61 +81,59 @@ export function LandingFaq() {
     ];
 
     return (
-        <section id="faq" className="bg-muted/30 py-20 sm:py-32">
-            <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-                {/* Section Header */}
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+        <section id="faq" className="px-4 pt-10 pb-28 sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-7xl flex-col gap-12 lg:flex-row lg:gap-16">
+                <Reveal className="flex flex-col gap-3.5 lg:flex-1">
+                    <h2 className="text-4xl leading-[1.1] font-extrabold tracking-[-0.03em] sm:text-[44px]">
                         {t('landing.faq.title.part1', 'Frequently Asked')}{' '}
-                        <span className="text-primary">
-                            {t('landing.faq.title.part2', 'Questions')}
-                        </span>
+                        {t('landing.faq.title.part2', 'Questions')}
                     </h2>
-                    <p className="mt-4 text-lg text-muted-foreground">
+                    <p className="leading-relaxed text-muted-foreground">
                         {t(
                             'landing.faq.description',
                             "Everything you need to know about Laravel SAAS Starter. Can't find the answer you're looking for? Contact our support team.",
                         )}
                     </p>
-                </div>
+                </Reveal>
 
-                {/* FAQ Accordion */}
-                <div className="mt-10 space-y-2">
-                    {faqs.map((faq, index) => (
-                        <div
-                            key={index}
-                            className="overflow-hidden rounded-md border bg-card"
-                        >
-                            <button
-                                onClick={() =>
-                                    setOpenIndex(
-                                        openIndex === index ? null : index,
-                                    )
-                                }
-                                className="flex w-full items-center justify-between p-4 text-left text-sm font-medium transition-colors hover:bg-muted/50 sm:px-5 sm:py-4"
-                            >
-                                <span>{faq.question}</span>
-                                <ChevronDown
-                                    className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${
-                                        openIndex === index ? 'rotate-180' : ''
+                <div className="flex flex-col border-t lg:flex-[2]">
+                    {faqs.map((faq, index) => {
+                        const isOpen = openIndex === index;
+
+                        return (
+                            <Reveal key={index} className="border-b">
+                                <button
+                                    type="button"
+                                    aria-expanded={isOpen}
+                                    onClick={() =>
+                                        setOpenIndex(isOpen ? null : index)
+                                    }
+                                    className="flex min-h-11 w-full items-center justify-between gap-4 py-5 text-left text-lg font-semibold"
+                                >
+                                    <span>{faq.question}</span>
+                                    <Plus
+                                        aria-hidden="true"
+                                        className={`size-6 shrink-0 text-highlight transition-transform duration-300 ${
+                                            isOpen ? 'rotate-45' : ''
+                                        }`}
+                                    />
+                                </button>
+                                <div
+                                    className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                                        isOpen
+                                            ? 'grid-rows-[1fr]'
+                                            : 'grid-rows-[0fr]'
                                     }`}
-                                />
-                            </button>
-                            <div
-                                className={`grid transition-all duration-300 ease-in-out ${
-                                    openIndex === index
-                                        ? 'grid-rows-[1fr]'
-                                        : 'grid-rows-[0fr]'
-                                }`}
-                            >
-                                <div className="overflow-hidden">
-                                    <p className="px-4 pb-4 text-muted-foreground sm:px-6 sm:pb-6">
-                                        {faq.answer}
-                                    </p>
+                                >
+                                    <div className="overflow-hidden">
+                                        <p className="pb-5 leading-relaxed text-muted-foreground">
+                                            {faq.answer}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                            </Reveal>
+                        );
+                    })}
                 </div>
             </div>
         </section>

@@ -17,9 +17,9 @@ const STYLES: Record<
     { bg: string; border: string; text: string; icon: typeof Info }
 > = {
     info: {
-        bg: 'bg-blue-50 dark:bg-blue-950/30',
-        border: 'border-blue-200 dark:border-blue-800',
-        text: 'text-blue-800 dark:text-blue-200',
+        bg: 'bg-accent',
+        border: 'border-border',
+        text: 'text-foreground [&_svg]:text-highlight [&_a]:text-highlight',
         icon: Info,
     },
     warning: {
@@ -57,7 +57,7 @@ export function AnnouncementBanner() {
         <div
             className={`relative border-b ${style.bg} ${style.border} ${style.text}`}
         >
-            <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 text-sm">
+            <div className="mx-auto flex max-w-7xl animate-rise items-center gap-3 px-4 py-2.5 text-sm">
                 <Icon className="h-4 w-4 shrink-0" />
                 <div className="min-w-0 flex-1">
                     <span className="font-medium">{announcement.title}</span>
@@ -82,7 +82,7 @@ export function AnnouncementBanner() {
                         onClick={() =>
                             setDismissed([...dismissed, announcement.id])
                         }
-                        className="shrink-0 rounded p-0.5 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+                        className="flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-black/10 dark:hover:bg-white/10"
                         aria-label="Dismiss"
                     >
                         <X className="h-3.5 w-3.5" />

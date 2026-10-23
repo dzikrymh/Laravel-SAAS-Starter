@@ -4,5 +4,7 @@ export { LandingFeatures } from './landing-features';
 export { LandingFooter } from './landing-footer';
 export { LandingHeader } from './landing-header';
 export { LandingHero } from './landing-hero';
+export { LandingMarquee } from './landing-marquee';
+export { LandingPlatform } from './landing-platform';
 export { LandingPricing } from './landing-pricing';
 export { LandingTestimonials } from './landing-testimonials';

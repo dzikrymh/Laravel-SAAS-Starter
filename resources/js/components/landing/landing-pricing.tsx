@@ -1,126 +1,95 @@
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { useTranslations } from '@/hooks/use-translations';
-import { register } from '@/routes';
-import { type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight, Check, Sparkles } from 'lucide-react';
+import {
+    motion,
+    useReducedMotion,
+    useScroll,
+    useTransform,
+} from 'motion/react';
+import { useRef } from 'react';
+import { Reveal } from './reveal';
 
+/**
+ * Dark band with two oversized lines sliding in opposite directions as the
+ * section scrolls past, followed by the open-source guarantees.
+ */
 export function LandingPricing() {
-    const { auth } = usePage<SharedData>().props;
     const { t } = useTranslations();
+    const prefersReducedMotion = useReducedMotion() ?? false;
+
+    const bandRef = useRef<HTMLElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: bandRef,
+        offset: ['start end', 'end start'],
+    });
+    const lineOneX = useTransform(scrollYProgress, [0, 1], ['8%', '-22%']);
+    const lineTwoX = useTransform(scrollYProgress, [0, 1], ['-22%', '8%']);
+
+    const items = [
+        {
+            title: t('landing.pricing.items.free.title', '100% Free'),
+            description: t(
+                'landing.pricing.items.free.description',
+                'No subscriptions, no per-project fees, no royalties. Use it however you want.',
+            ),
+        },
+        {
+            title: t('landing.pricing.items.license.title', 'MIT License'),
+            description: t(
+                'landing.pricing.items.license.description',
+                'Completely open source with permissive licensing. Commercial use is welcome.',
+            ),
+        },
+        {
+            title: t(
+                'landing.pricing.items.production.title',
+                'Production Ready',
+            ),
+            description: t(
+                'landing.pricing.items.production.description',
+                'Battle-tested code following Laravel best practices. Ready for production use.',
+            ),
+        },
+    ];
+
+    const lineOne = `${items[0].title} · ${items[1].title} · ${items[0].title} · ${items[1].title}`;
+    const lineTwo = `${items[2].title} · ${t('landing.pricing.title.part3', 'Open Source')} · ${items[2].title} · ${t('landing.pricing.title.part3', 'Open Source')}`;
 
     return (
-        <section id="pricing" className="bg-muted/30 py-20 sm:py-32">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {/* Section Header */}
-                <div className="mx-auto max-w-3xl text-center">
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-                        {t('landing.pricing.title.part1', 'Completely')}{' '}
-                        <span className="text-primary">
-                            {t('landing.pricing.title.part2', 'Free')}
-                        </span>{' '}
-                        & {t('landing.pricing.title.part3', 'Open Source')}
-                    </h2>
-                    <p className="mt-4 text-lg text-muted-foreground">
-                        {t(
-                            'landing.pricing.description',
-                            'No credit card required. No hidden fees. Use it for unlimited personal and commercial projects.',
-                        )}
-                    </p>
-                </div>
+        <section
+            id="pricing"
+            ref={bandRef}
+            aria-label={t('landing.pricing.title.part3', 'Open Source')}
+            className="dark flex flex-col gap-2 overflow-hidden border-y border-white/10 bg-ink py-28 text-white"
+        >
+            <motion.div
+                aria-hidden="true"
+                style={prefersReducedMotion ? undefined : { x: lineOneX }}
+                className="text-[clamp(56px,10vw,150px)] leading-none font-extrabold tracking-[-0.04em] whitespace-nowrap uppercase"
+            >
+                {lineOne}
+            </motion.div>
+            <motion.div
+                aria-hidden="true"
+                style={prefersReducedMotion ? undefined : { x: lineTwoX }}
+                className="text-[clamp(56px,10vw,150px)] leading-none font-extrabold tracking-[-0.04em] whitespace-nowrap text-transparent uppercase [-webkit-text-stroke:1.5px_#8fb0ff]"
+            >
+                {lineTwo}
+            </motion.div>
 
-                {/* Open Source Benefits */}
-                <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <Card className="relative border-border">
-                        <CardHeader>
-                            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                                <Sparkles className="h-5 w-5 text-primary" />
-                            </div>
-                            <CardTitle className="text-xl">
-                                {t(
-                                    'landing.pricing.items.free.title',
-                                    '100% Free',
-                                )}
-                            </CardTitle>
-                            <CardDescription>
-                                {t(
-                                    'landing.pricing.items.free.description',
-                                    'No subscriptions, no per-project fees, no royalties. Use it however you want.',
-                                )}
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-
-                    <Card className="relative border-border">
-                        <CardHeader>
-                            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                                <Check className="h-5 w-5 text-primary" />
-                            </div>
-                            <CardTitle className="text-xl">
-                                {t(
-                                    'landing.pricing.items.license.title',
-                                    'MIT License',
-                                )}
-                            </CardTitle>
-                            <CardDescription>
-                                {t(
-                                    'landing.pricing.items.license.description',
-                                    'Completely open source with permissive licensing. Commercial use is welcome.',
-                                )}
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-
-                    <Card className="relative border-border">
-                        <CardHeader>
-                            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                                <Sparkles className="h-5 w-5 text-primary" />
-                            </div>
-                            <CardTitle className="text-xl">
-                                {t(
-                                    'landing.pricing.items.production.title',
-                                    'Production Ready',
-                                )}
-                            </CardTitle>
-                            <CardDescription>
-                                {t(
-                                    'landing.pricing.items.production.description',
-                                    'Battle-tested code following Laravel best practices. Ready for production use.',
-                                )}
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-                </div>
-
-                {/* CTA */}
-                <div className="mt-12 text-center">
-                    <Button size="lg" asChild className="h-12 px-8 text-base">
-                        <Link href={auth.user ? '/dashboard' : register()}>
-                            {t(
-                                'landing.pricing.cta.get_started',
-                                'Get Started Free',
-                            )}
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <p className="mt-4 text-sm text-muted-foreground">
-                        {t('landing.pricing.cta.or', 'Or')}{' '}
-                        <a
-                            href="https://github.com/xco-agency/laravel-saas-starter"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-primary hover:underline"
-                        >
-                            {t('landing.pricing.cta.github', 'view on GitHub')}
-                        </a>
-                    </p>
-                </div>
+            <div className="mx-auto mt-16 grid w-full max-w-6xl gap-8 px-6 sm:grid-cols-3">
+                {items.map((item, index) => (
+                    <Reveal
+                        key={item.title}
+                        from="left"
+                        delay={index * 0.08}
+                        className="flex flex-col gap-2"
+                    >
+                        <h3 className="text-xl font-semibold">{item.title}</h3>
+                        <p className="leading-relaxed text-muted-foreground">
+                            {item.description}
+                        </p>
+                    </Reveal>
+                ))}
             </div>
         </section>
     );

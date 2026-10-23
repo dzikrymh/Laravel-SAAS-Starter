@@ -104,24 +104,24 @@ export function LandingFooter() {
         },
     ];
     return (
-        <footer className="border-t border-white/10 bg-foreground text-white">
+        <footer className="border-t bg-background text-foreground">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
                 {/* Top section */}
                 <div className="grid gap-8 lg:grid-cols-6">
                     {/* Logo & Description */}
                     <div className="lg:col-span-2">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-sm bg-accent">
-                                <Sparkles className="h-4 w-4 text-foreground" />
+                            <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
+                                <Sparkles className="size-4 text-white" />
                             </div>
-                            <span className="text-base font-bold tracking-tight text-white">
+                            <span className="text-base font-bold tracking-tight">
                                 {t(
                                     'landing.footer.brand',
                                     'Laravel SAAS Starter',
                                 )}
                             </span>
                         </Link>
-                        <p className="mt-4 max-w-xs text-sm text-white/50">
+                        <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
                             {t(
                                 'landing.footer.description',
                                 'The ultimate Laravel SaaS starter kit by XCO Agency. Build and launch your product 10x faster.',
@@ -133,10 +133,10 @@ export function LandingFooter() {
                                 <a
                                     key={social.label}
                                     href={social.href}
-                                    className="text-white/40 transition-colors hover:text-white"
+                                    className="flex size-10 items-center justify-center rounded-lg border text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
                                     aria-label={social.label}
                                 >
-                                    <social.icon className="h-5 w-5" />
+                                    <social.icon className="size-[18px]" />
                                 </a>
                             ))}
                         </div>
@@ -145,7 +145,7 @@ export function LandingFooter() {
                     {/* Links */}
                     {Object.values(footerLinks).map((section) => (
                         <div key={section.title}>
-                            <h3 className="text-xs font-semibold tracking-wider text-white/70 uppercase">
+                            <h3 className="text-xs font-semibold tracking-[0.08em] text-foreground uppercase">
                                 {section.title}
                             </h3>
                             <ul className="mt-4 space-y-3">
@@ -153,7 +153,7 @@ export function LandingFooter() {
                                     <li key={link.label}>
                                         <a
                                             href={link.href}
-                                            className="text-sm text-white/40 transition-colors hover:text-white"
+                                            className="text-sm text-muted-foreground transition-colors hover:text-highlight"
                                             target={
                                                 link.href.startsWith('http')
                                                     ? '_blank'
@@ -175,8 +175,8 @@ export function LandingFooter() {
                 </div>
 
                 {/* Bottom section */}
-                <div className="mt-12 border-t border-white/10 pt-8">
-                    <p className="text-center text-sm text-white/30">
+                <div className="mt-12 border-t pt-8">
+                    <p className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()}{' '}
                         {t(
                             'landing.footer.copyright',

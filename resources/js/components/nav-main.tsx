@@ -22,7 +22,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const { t } = useTranslations();
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>
+            <SidebarGroupLabel className="text-[11px] font-semibold tracking-[0.08em] uppercase">
                 {t('navigation.platform', 'Platform')}
             </SidebarGroupLabel>
             <SidebarMenu>

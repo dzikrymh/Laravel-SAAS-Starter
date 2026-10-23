@@ -50,7 +50,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
                         <TextLink
                             href={logout()}
-                            className="mx-auto block text-sm font-semibold"
+                            className="mx-auto block text-sm font-semibold text-highlight no-underline hover:underline"
                         >
                             {t('auth.sign_out', 'Sign Out')}
                         </TextLink>

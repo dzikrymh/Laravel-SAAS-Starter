@@ -58,7 +58,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="my-6 flex items-center justify-start">
                                 <Button
-                                    className="w-full"
+                                    className="h-12 w-full text-[15px] transition-[translate,box-shadow] hover:-translate-y-px hover:shadow-[0_10px_26px_-10px_var(--primary)]"
                                     size="lg"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
@@ -80,7 +80,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     <span>
                         {t('auth.reset_password.or_return', 'Or, return to')}
                     </span>
-                    <TextLink href={login()} className="font-semibold">
+                    <TextLink href={login()} className="font-semibold text-highlight no-underline hover:underline">
                         {t('auth.log_in', 'Sign in')}
                     </TextLink>
                 </div>

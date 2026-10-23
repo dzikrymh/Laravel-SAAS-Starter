@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import {
     InputOTP,
     InputOTPGroup,
+    InputOTPSeparator,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { useTranslations } from '@/hooks/use-translations';
@@ -13,6 +14,8 @@ import { store } from '@/routes/two-factor/login';
 import { Form, Head } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
+
+const OTP_GROUP_LENGTH = OTP_MAX_LENGTH / 2;
 
 export default function TwoFactorChallenge() {
     const { t } = useTranslations();
@@ -113,11 +116,30 @@ export default function TwoFactorChallenge() {
                                         >
                                             <InputOTPGroup>
                                                 {Array.from(
-                                                    { length: OTP_MAX_LENGTH },
+                                                    {
+                                                        length: OTP_GROUP_LENGTH,
+                                                    },
                                                     (_, index) => (
                                                         <InputOTPSlot
                                                             key={index}
                                                             index={index}
+                                                        />
+                                                    ),
+                                                )}
+                                            </InputOTPGroup>
+                                            <InputOTPSeparator />
+                                            <InputOTPGroup>
+                                                {Array.from(
+                                                    {
+                                                        length: OTP_GROUP_LENGTH,
+                                                    },
+                                                    (_, index) => (
+                                                        <InputOTPSlot
+                                                            key={index}
+                                                            index={
+                                                                OTP_GROUP_LENGTH +
+                                                                index
+                                                            }
                                                         />
                                                     ),
                                                 )}
@@ -130,7 +152,7 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="h-12 w-full text-[15px] transition-[translate,box-shadow] hover:-translate-y-px hover:shadow-[0_10px_26px_-10px_var(--primary)]"
                                 disabled={processing}
                             >
                                 {t(
