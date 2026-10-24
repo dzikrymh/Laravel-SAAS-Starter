@@ -22,7 +22,7 @@ export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
 
     return (
-        <div className="space-y-6">
+        <section className="flex flex-col gap-5 rounded-2xl border border-destructive/30 bg-card p-6">
             <HeadingSmall
                 title={t('settings.delete_account.title', 'Delete account')}
                 description={t(
@@ -30,8 +30,8 @@ export default function DeleteUser() {
                     'Delete your account and all of its resources',
                 )}
             />
-            <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
-                <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
+            <div className="space-y-4 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+                <div className="relative space-y-0.5 text-destructive">
                     <p className="font-medium">
                         {t('settings.delete_account.warning', 'Warning')}
                     </p>
@@ -141,6 +141,6 @@ export default function DeleteUser() {
                     </DialogContent>
                 </Dialog>
             </div>
-        </div>
+        </section>
     );
 }

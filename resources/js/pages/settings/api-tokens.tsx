@@ -83,8 +83,11 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                 )}
                 fullWidth
             >
-                <div className="space-y-6">
-                    <form onSubmit={createToken} className="space-y-6">
+                <div className="flex flex-col gap-5">
+                    <form
+                        onSubmit={createToken}
+                        className="flex flex-col gap-5 rounded-2xl border bg-card p-6"
+                    >
                         <div className="grid gap-2">
                             <Label htmlFor="name">
                                 {t(
@@ -112,7 +115,7 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                                         message={errors.name}
                                     />
                                 </div>
-                                <Button disabled={processing} className="mt-1">
+                                <Button disabled={processing} className="mt-1 h-12">
                                     {t(
                                         'settings.api_tokens.create.button',
                                         'Create',
@@ -123,7 +126,7 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                     </form>
 
                     {flash?.token && (
-                        <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/30">
+                        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/30 dark:bg-emerald-500/10">
                             <div className="flex">
                                 <div className="ml-3">
                                     <h3 className="text-sm font-medium text-green-800 dark:text-green-200">
@@ -139,7 +142,7 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                                                 'Please copy your new API token. For your security, it will NOT be shown again.',
                                             )}
                                         </p>
-                                        <div className="mt-3 flex items-center rounded bg-gray-100 p-2 font-mono text-xs break-all dark:bg-gray-800">
+                                        <div className="mt-3 flex items-center rounded-lg border bg-card p-2.5 font-mono text-xs break-all">
                                             {flash.token}
                                         </div>
                                     </div>
@@ -162,7 +165,7 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                                     {tokens.map((token) => (
                                         <div
                                             key={token.id}
-                                            className="flex items-center justify-between rounded-md border bg-card p-4 text-card-foreground shadow-sm"
+                                            className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 text-card-foreground transition-colors hover:border-primary/40"
                                         >
                                             <div>
                                                 <div className="font-medium">

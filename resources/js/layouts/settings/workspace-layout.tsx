@@ -1,15 +1,12 @@
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useTranslations } from '@/hooks/use-translations';
-import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
+import SettingsShell from '@/layouts/settings/settings-shell';
 import {
     type NavItem,
     type SharedData,
     type Workspace,
     type WorkspaceRole,
 } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import {
     Activity,
     AlertTriangle,
@@ -24,7 +21,7 @@ import {
     Users,
     Webhook,
 } from 'lucide-react';
-import { type PropsWithChildren, useMemo } from 'react';
+import { type PropsWithChildren, type ReactNode, useMemo } from 'react';
 
 interface NavSection {
     title: string;
@@ -172,6 +169,7 @@ interface WorkspaceLayoutProps extends PropsWithChildren {
     title?: string;
     description?: string;
     fullWidth?: boolean;
+    actions?: ReactNode;
 }
 
 export default function WorkspaceLayout({
@@ -179,8 +177,9 @@ export default function WorkspaceLayout({
     title,
     description,
     fullWidth = false,
+    actions,
 }: WorkspaceLayoutProps) {
-    const { t, i18n } = useTranslations();
+    const { t } = useTranslations();
     const { currentWorkspace } = usePage<SharedData>().props;
     const userRole = currentWorkspace?.role;
     const navSections = useMemo(
@@ -188,98 +187,26 @@ export default function WorkspaceLayout({
         [t, currentWorkspace, userRole],
     );
 
-    const defaultTitle =
-        title ?? t('settings.workspace.title', 'Workspace Settings');
-    const defaultDescription =
-        description ??
-        t('settings.workspace.description', 'Manage your workspace settings');
-
-    if (typeof window === 'undefined') {
-        return null;
-    }
-
-    const currentPath = window.location.pathname;
-    const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
-    const isRTL = RTL_LANGUAGES.includes(i18n.language);
+    const settingsTitle = t('settings.workspace.title', 'Workspace Settings');
 
     return (
-        <div className="px-4 py-6" dir={isRTL ? 'rtl' : 'ltr'}>
-            <Heading title={defaultTitle} description={defaultDescription} />
-
-            <div
-                className={cn(
-                    'settings-layout-container flex flex-col lg:flex-row lg:gap-12',
-                    {
-                        'lg:flex-row-reverse': isRTL,
-                    },
-                )}
-                data-rtl={isRTL}
-            >
-                <aside
-                    className={cn(
-                        'settings-layout-sidebar w-full max-w-xl lg:w-48',
-                        {
-                            'lg:order-2': isRTL,
-                        },
-                    )}
-                    data-rtl={isRTL}
-                >
-                    <nav className="flex flex-col space-y-6">
-                        {navSections.map((section) => (
-                            <div key={section.title}>
-                                <h4 className="mb-2 px-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                    {section.title}
-                                </h4>
-                                <div className="flex flex-col space-y-1">
-                                    {section.items.map((item, index) => (
-                                        <Button
-                                            key={`${resolveUrl(item.href)}-${index}`}
-                                            size="sm"
-                                            variant="ghost"
-                                            asChild
-                                            className={cn(
-                                                'w-full justify-start',
-                                                {
-                                                    'bg-muted': isSameUrl(
-                                                        currentPath,
-                                                        item.href,
-                                                    ),
-                                                },
-                                            )}
-                                        >
-                                            <Link href={item.href}>
-                                                {item.icon && (
-                                                    <item.icon className="h-4 w-4" />
-                                                )}
-                                                {item.title}
-                                            </Link>
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </nav>
-                </aside>
-
-                <Separator className="my-6 lg:hidden" />
-
-                <div
-                    className={cn('settings-layout-content flex-1', {
-                        'md:max-w-2xl': !fullWidth,
-                        'lg:order-1': isRTL,
-                    })}
-                    data-rtl={isRTL}
-                >
-                    <section
-                        className={cn('space-y-12', {
-                            'max-w-xl': !fullWidth,
-                            'w-full': fullWidth,
-                        })}
-                    >
-                        {children}
-                    </section>
-                </div>
-            </div>
-        </div>
+        <SettingsShell
+            sections={navSections}
+            title={title ?? settingsTitle}
+            description={
+                description ??
+                t(
+                    'settings.workspace.description',
+                    'Manage your workspace settings',
+                )
+            }
+            eyebrow={settingsTitle}
+            navLabel={settingsTitle}
+            actions={actions}
+            fullWidth={fullWidth}
+            dangerHref="/settings/workspace-danger-zone"
+        >
+            {children}
+        </SettingsShell>
     );
 }

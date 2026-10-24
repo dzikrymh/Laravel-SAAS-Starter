@@ -216,11 +216,15 @@ export default function BillingIndex({
                 )}
                 fullWidth
             >
-                <div className="space-y-8 pb-12">
-                    <div className="grid gap-8 lg:grid-cols-3">
+                <div className="flex flex-col gap-5">
+                    <div className="grid gap-5 lg:grid-cols-3">
                         {/* Current Plan */}
-                        <Card className="glass animate-fade-in-up overflow-hidden border-2 border-primary/10 transition-all hover:border-primary/30 lg:col-span-2">
-                            <CardHeader className="border-b border-primary/5 bg-muted/30 pb-6">
+                        <Card className="dark animate-fade-in-up relative overflow-hidden border bg-ink text-foreground lg:col-span-2">
+                            <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -top-28 -right-16 h-72 w-[420px] bg-[radial-gradient(closest-side,rgb(61_99_245/0.45),transparent)] blur-2xl"
+                            />
+                            <CardHeader className="relative border-b border-white/10 pb-6">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="flex items-center gap-2">
@@ -241,7 +245,7 @@ export default function BillingIndex({
                                     {getStatusBadge()}
                                 </div>
                             </CardHeader>
-                            <CardContent className="pt-6">
+                            <CardContent className="relative pt-1">
                                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                                     <div className="space-y-1">
                                         <p className="text-4xl font-extrabold tracking-tight">
@@ -460,7 +464,7 @@ export default function BillingIndex({
 
                                 {/* Plan Features */}
                                 {currentPlan && (
-                                    <div className="-mx-6 mt-8 border-t bg-muted/30 px-6 py-6">
+                                    <div className="-mx-6 mt-8 -mb-6 border-t border-white/10 bg-white/[0.03] px-6 py-6">
                                         <h4 className="mb-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                             {t(
                                                 'billing.plan_includes',
@@ -490,7 +494,7 @@ export default function BillingIndex({
                             <Deferred
                                 data="upcoming_invoice"
                                 fallback={
-                                    <Card className="glass animate-fade-in-up border-none delay-200">
+                                    <Card className="animate-fade-in-up border-none delay-200">
                                         <ViewSkeleton rows={2} />
                                     </Card>
                                 }
@@ -524,7 +528,7 @@ export default function BillingIndex({
 
                             {/* Payment Method Quick Look */}
                             {subscription && isOwner && (
-                                <Card className="glass animate-fade-in-up transition-all delay-300 hover:bg-muted/30">
+                                <Card className="animate-fade-in-up transition-all delay-300 hover:bg-muted/30">
                                     <CardHeader className="pt-4 pb-3">
                                         <CardTitle className="flex items-center gap-2 text-sm font-bold tracking-tight text-muted-foreground uppercase">
                                             <CreditCard className="h-3.5 w-3.5" />
@@ -555,7 +559,7 @@ export default function BillingIndex({
 
                             {/* Trial Countdown or Help */}
                             {!subscription && workspace.plan === 'Free' && (
-                                <Card className="glass animate-fade-in-up border-dashed bg-muted/20 delay-300">
+                                <Card className="animate-fade-in-up border-dashed bg-muted/20 delay-300">
                                     <CardContent className="flex flex-col items-center pt-8 pb-8 text-center">
                                         <Sparkles className="mb-4 h-10 w-10 text-primary opacity-50" />
                                         <p className="mb-2 text-lg font-bold">
@@ -585,7 +589,7 @@ export default function BillingIndex({
                     <Deferred
                         data="usage"
                         fallback={
-                            <Card className="glass animate-fade-in-up overflow-hidden shadow-sm delay-400">
+                            <Card className="animate-fade-in-up overflow-hidden shadow-sm delay-400">
                                 <CardHeader className="border-b bg-muted/10">
                                     <Skeleton className="h-6 w-32" />
                                 </CardHeader>
@@ -595,7 +599,7 @@ export default function BillingIndex({
                             </Card>
                         }
                     >
-                        <Card className="glass animate-fade-in-up overflow-hidden shadow-sm delay-400">
+                        <Card className="animate-fade-in-up overflow-hidden shadow-sm delay-400">
                             <CardHeader className="border-b bg-muted/10">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -724,7 +728,7 @@ export default function BillingIndex({
                     <Deferred
                         data="invoices"
                         fallback={
-                            <Card className="glass animate-fade-in-up border-none shadow-sm delay-500">
+                            <Card className="animate-fade-in-up border-none shadow-sm delay-500">
                                 <CardHeader className="pb-4">
                                     <Skeleton className="h-6 w-32" />
                                 </CardHeader>
@@ -735,7 +739,7 @@ export default function BillingIndex({
                         }
                     >
                         {invoices?.length > 0 && (
-                            <Card className="glass animate-fade-in-up border-none shadow-sm delay-500">
+                            <Card className="animate-fade-in-up border-none shadow-sm delay-500">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="flex items-center gap-2 text-lg font-bold">
                                         <Receipt className="h-5 w-5 text-muted-foreground" />

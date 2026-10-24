@@ -16,6 +16,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
+import { cn } from '@/lib/utils';
 import {
     destroy as destroyLogo,
     update as updateLogo,
@@ -29,12 +30,13 @@ import { Head, router, useForm } from '@inertiajs/react';
 import {
     AlertTriangle,
     CalendarDays,
-    CheckCircle2,
-    Circle,
+    Check,
     Crown,
     Download,
     Key,
+    Lock,
     Palette,
+    Trash2,
     Users,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -69,7 +71,16 @@ export default function WorkspaceSettings({
     onboardingProgress,
 }: WorkspaceSettingsProps) {
     const { t } = useTranslations();
-    const { data, setData, errors, processing, isDirty } = useForm({
+    const {
+        data,
+        setData,
+        errors,
+        processing,
+        isDirty,
+        put,
+        reset,
+        setDefaults,
+    } = useForm({
         name: workspace.name,
         slug: workspace.slug,
         logo: null as File | null,
@@ -84,13 +95,17 @@ export default function WorkspaceSettings({
     const isAdmin = userRole === 'owner' || userRole === 'admin';
     const isOwner = userRole === 'owner';
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        router.put('/workspaces/settings', data, {
+    const saveSettings = () => {
+        put('/workspaces/settings', {
             forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => setDefaults(),
         });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        saveSettings();
     };
 
     const handleDelete = () => {
@@ -103,10 +118,46 @@ export default function WorkspaceSettings({
         window.location.href = '/workspaces/export';
     };
 
+    const presetColors = [
+        '#6366f1',
+        '#8b5cf6',
+        '#ec4899',
+        '#ef4444',
+        '#f97316',
+        '#eab308',
+        '#22c55e',
+        '#06b6d4',
+        '#3b82f6',
+        '#64748b',
+    ];
+    const previewColor = data.accent_color || 'var(--primary)';
+
+    const quickStats = [
+        {
+            icon: Users,
+            label: t('workspace.settings.stats_members', 'Members'),
+            value: stats.members_count,
+        },
+        {
+            icon: Crown,
+            label: t('workspace.settings.stats_plan', 'Plan'),
+            value: workspace.plan,
+        },
+        {
+            icon: CalendarDays,
+            label: t('workspace.settings.stats_created', 'Created'),
+            value: new Date(workspace.created_at).toLocaleDateString(),
+        },
+        {
+            icon: Key,
+            label: t('workspace.settings.stats_api_keys', 'API Keys'),
+            value: stats.api_keys_count,
+        },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('workspace.settings.title', 'Workspace Settings')} />
-
             <WorkspaceLayout
                 title={t('workspace.settings.title', 'Workspace Settings')}
                 description={t(
@@ -115,151 +166,114 @@ export default function WorkspaceSettings({
                 )}
                 fullWidth
             >
-                <div className="space-y-6">
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                            <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <div className="min-w-0">
-                                <p className="text-xs text-muted-foreground">
-                                    {t(
-                                        'workspace.settings.stats_members',
-                                        'Members',
-                                    )}
-                                </p>
-                                <p className="text-sm font-semibold">
-                                    {stats.members_count}
-                                </p>
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+                    {quickStats.map((stat) => (
+                        <div
+                            key={stat.label}
+                            className="flex items-center gap-3 rounded-[14px] border bg-card px-4 py-3.5"
+                        >
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-foreground">
+                                <stat.icon className="size-4" />
+                            </span>
+                            <div className="flex min-w-0 flex-col">
+                                <span className="text-xs text-muted-foreground">
+                                    {stat.label}
+                                </span>
+                                <span className="truncate text-base font-bold">
+                                    {stat.value}
+                                </span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                            <Crown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <div className="min-w-0">
-                                <p className="text-xs text-muted-foreground">
-                                    {t('workspace.settings.stats_plan', 'Plan')}
-                                </p>
-                                <p className="truncate text-sm font-semibold">
-                                    {workspace.plan}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                            <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <div className="min-w-0">
-                                <p className="text-xs text-muted-foreground">
-                                    {t(
-                                        'workspace.settings.stats_created',
-                                        'Created',
-                                    )}
-                                </p>
-                                <p className="text-sm font-semibold">
-                                    {new Date(
-                                        workspace.created_at,
-                                    ).toLocaleDateString()}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                            <Key className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <div className="min-w-0">
-                                <p className="text-xs text-muted-foreground">
-                                    {t(
-                                        'workspace.settings.stats_api_keys',
-                                        'API Keys',
-                                    )}
-                                </p>
-                                <p className="text-sm font-semibold">
-                                    {stats.api_keys_count}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    ))}
+                </div>
 
-                    {/* Workspace Onboarding Progress */}
-                    {onboardingProgress.score < 100 && (
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-sm font-medium">
-                                        Workspace Setup Progress
-                                    </CardTitle>
-                                    <span className="text-sm font-semibold text-primary">
-                                        {onboardingProgress.score}%
-                                    </span>
-                                </div>
-                                <Progress
-                                    value={onboardingProgress.score}
-                                    className="h-2"
-                                />
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                                <div className="grid gap-1.5 sm:grid-cols-2">
-                                    {onboardingProgress.steps.map((step) => (
-                                        <div
-                                            key={step.key}
-                                            className="flex items-center gap-2 text-sm"
-                                        >
-                                            {step.completed ? (
-                                                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                                            ) : (
-                                                <Circle className="h-4 w-4 shrink-0 text-muted-foreground/40" />
-                                            )}
-                                            <span
-                                                className={
-                                                    step.completed
-                                                        ? 'text-muted-foreground line-through'
-                                                        : ''
-                                                }
-                                            >
-                                                {step.label}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* General Settings */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                {t('navigation.general', 'General')}
-                            </CardTitle>
-                            <CardDescription>
+                {/* Workspace Onboarding Progress */}
+                {onboardingProgress.score < 100 && (
+                    <section className="flex flex-col gap-3.5 rounded-2xl border bg-card px-[22px] py-5">
+                        <div className="flex items-center justify-between gap-3">
+                            <h2 className="text-[15px] font-bold">
                                 {t(
-                                    'workspace.settings.description',
-                                    'Manage your workspace settings and configuration.',
+                                    'workspace.settings.setup_progress',
+                                    'Workspace Setup Progress',
                                 )}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-4">
-                                    <AvatarUpload
-                                        currentUrl={workspace.logo_url}
-                                        uploadUrl={updateLogo().url}
-                                        deleteUrl={destroyLogo().url}
-                                        onSuccess={() => {
-                                            router.reload({
-                                                only: ['workspace'],
-                                            });
-                                        }}
-                                        label={t(
-                                            'workspace.settings.logo',
-                                            'Logo',
-                                        )}
-                                        description={t(
-                                            'workspace.settings.logo_description',
-                                            'Your workspace logo appears in the sidebar, team invitations, and exported data. Recommended size: 200×200px.',
-                                        )}
-                                        fieldName="image"
-                                    />
-                                    <InputError message={errors.logo} />
+                            </h2>
+                            <span className="text-sm font-bold text-highlight">
+                                {onboardingProgress.score}%
+                            </span>
+                        </div>
+                        <Progress
+                            value={onboardingProgress.score}
+                            className="h-2"
+                        />
+                        <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 xl:grid-cols-3">
+                            {onboardingProgress.steps.map((step) => (
+                                <div
+                                    key={step.key}
+                                    className={cn(
+                                        'flex items-center gap-2 text-sm',
+                                        step.completed &&
+                                            'text-muted-foreground line-through',
+                                    )}
+                                >
+                                    {step.completed ? (
+                                        <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500">
+                                            <Check
+                                                className="size-3"
+                                                strokeWidth={3}
+                                            />
+                                        </span>
+                                    ) : (
+                                        <span className="size-[18px] shrink-0 rounded-full border-2" />
+                                    )}
+                                    {step.label}
                                 </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
-                                {/* Name */}
-                                <div className="space-y-2">
+                {/* General Settings */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-[17px]">
+                            {t('navigation.general', 'General')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t(
+                                'workspace.settings.description',
+                                'Manage your workspace settings and configuration.',
+                            )}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form
+                            id="workspace-settings-form"
+                            onSubmit={handleSubmit}
+                            className="flex flex-col gap-5"
+                        >
+                            <div className="flex flex-col gap-2 border-b pb-5">
+                                <AvatarUpload
+                                    currentUrl={workspace.logo_url}
+                                    uploadUrl={updateLogo().url}
+                                    deleteUrl={destroyLogo().url}
+                                    onSuccess={() => {
+                                        router.reload({
+                                            only: ['workspace'],
+                                        });
+                                    }}
+                                    label={t('workspace.settings.logo', 'Logo')}
+                                    description={t(
+                                        'workspace.settings.logo_description',
+                                        'Your workspace logo appears in the sidebar, team invitations, and exported data. Recommended size: 200×200 px.',
+                                    )}
+                                    fieldName="image"
+                                />
+                                <InputError message={errors.logo} />
+                            </div>
+
+                            <div className="grid gap-5 md:grid-cols-2">
+                                <div className="flex flex-col gap-2">
                                     <Label htmlFor="name">
                                         {t(
                                             'workspace.settings.name',
@@ -282,8 +296,7 @@ export default function WorkspaceSettings({
                                     <InputError message={errors.name} />
                                 </div>
 
-                                {/* Slug */}
-                                <div className="space-y-2">
+                                <div className="flex flex-col gap-2">
                                     <Label
                                         htmlFor="slug"
                                         className="flex items-center gap-1.5"
@@ -295,7 +308,7 @@ export default function WorkspaceSettings({
                                         <HelpTooltip content="The URL-friendly identifier for your workspace. Used in links and API endpoints. Only letters, numbers, dashes, and underscores." />
                                     </Label>
                                     <div className="flex items-center">
-                                        <span className="rounded-l-md border border-r-0 bg-muted px-3 py-2 text-sm text-muted-foreground">
+                                        <span className="flex h-9 items-center rounded-l-md border border-r-0 bg-muted px-3 font-mono text-sm text-muted-foreground">
                                             /
                                         </span>
                                         <Input
@@ -308,464 +321,440 @@ export default function WorkspaceSettings({
                                                 'workspace.create.slug_placeholder',
                                                 'my-awesome-workspace',
                                             )}
-                                            className="rounded-l-none"
+                                            className="rounded-l-none font-mono"
                                             disabled={!isAdmin}
                                         />
                                     </div>
                                     <InputError message={errors.slug} />
-                                    {data.slug !== workspace.slug && (
-                                        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                                            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                                            Changing the slug will break any
-                                            existing links to this workspace.
-                                        </p>
-                                    )}
                                 </div>
-
-                                {isAdmin && (
-                                    <Button
-                                        type="submit"
-                                        disabled={processing || !isDirty}
-                                        className={!isDirty ? 'opacity-50' : ''}
-                                    >
-                                        {processing && (
-                                            <Spinner className="mr-2" />
-                                        )}
-                                        {t(
-                                            'workspace.settings.save',
-                                            'Save Changes',
-                                        )}
-                                    </Button>
-                                )}
-                            </form>
-                        </CardContent>
-                    </Card>
-
-                    {/* Plan Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                {t('billing.current_plan', 'Current Plan')}
-                            </CardTitle>
-                            <CardDescription>
-                                {t(
-                                    'billing.your_workspace_on',
-                                    'Your workspace is on the {{plan}} plan.',
-                                    { plan: workspace.plan },
-                                )}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-2xl font-bold">
-                                        {workspace.plan}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {workspace.plan === 'Free'
-                                            ? t(
-                                                  'billing.no_subscription_desc',
-                                                  'Upgrade to a paid plan to unlock more features and team members.',
-                                              )
-                                            : t(
-                                                  'billing.thank_you',
-                                                  'Thank you for being a subscriber!',
-                                              )}
-                                    </p>
-                                </div>
-                                <Button variant="outline" asChild>
-                                    <a href="/billing">
-                                        {t(
-                                            'billing.manage_subscription',
-                                            'Manage Subscription',
-                                        )}
-                                    </a>
-                                </Button>
                             </div>
-                        </CardContent>
-                    </Card>
 
-                    {/* Branding */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Palette className="h-5 w-5" />
-                                {t('workspace.settings.branding', 'Branding')}
-                            </CardTitle>
-                            <CardDescription>
-                                {t(
-                                    'workspace.settings.branding_description',
-                                    'Customize the accent color used across your workspace.',
-                                )}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="accent_color">
-                                        {t(
+                            {data.slug !== workspace.slug && (
+                                <p
+                                    role="alert"
+                                    className="flex items-center gap-2 rounded-[10px] bg-amber-50 px-3 py-2.5 text-[13px] text-amber-800 dark:bg-amber-500/10 dark:text-amber-300"
+                                >
+                                    <AlertTriangle className="size-4 shrink-0" />
+                                    Changing the slug will break any existing
+                                    links to this workspace.
+                                </p>
+                            )}
+                        </form>
+                    </CardContent>
+                </Card>
+
+                {/* Plan Information */}
+                <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card p-6">
+                    <div className="flex items-center gap-4">
+                        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                            <Crown className="size-[22px]" />
+                        </span>
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-[13px] text-muted-foreground">
+                                {t('billing.current_plan', 'Current Plan')}
+                            </span>
+                            <span className="text-xl font-extrabold">
+                                {workspace.plan}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                                {workspace.plan === 'Free'
+                                    ? t(
+                                          'billing.no_subscription_desc',
+                                          'Upgrade to a paid plan to unlock more features and team members.',
+                                      )
+                                    : t(
+                                          'billing.thank_you',
+                                          'Thank you for being a subscriber!',
+                                      )}
+                            </span>
+                        </div>
+                    </div>
+                    <Button variant="outline" asChild>
+                        <a href="/billing">
+                            {t(
+                                'billing.manage_subscription',
+                                'Manage Subscription',
+                            )}
+                        </a>
+                    </Button>
+                </section>
+
+                {/* Branding */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex flex-col gap-1.5">
+                                <CardTitle className="flex items-center gap-2 text-[17px]">
+                                    <Palette className="size-[18px] text-highlight" />
+                                    {t(
+                                        'workspace.settings.branding',
+                                        'Branding',
+                                    )}
+                                </CardTitle>
+                                <CardDescription>
+                                    {t(
+                                        'workspace.settings.branding_description',
+                                        'Customize the accent color used across your workspace.',
+                                    )}
+                                </CardDescription>
+                            </div>
+                            {data.accent_color && isAdmin && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setData('accent_color', '')}
+                                >
+                                    {t(
+                                        'workspace.settings.reset_color',
+                                        'Reset',
+                                    )}
+                                </Button>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-6 md:grid-cols-2">
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="accent_color">
+                                    {t(
+                                        'workspace.settings.accent_color',
+                                        'Accent Color',
+                                    )}
+                                </Label>
+                                <div className="flex items-center gap-2.5">
+                                    <input
+                                        type="color"
+                                        id="accent_color"
+                                        value={data.accent_color || '#6366f1'}
+                                        onChange={(e) =>
+                                            setData(
+                                                'accent_color',
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="size-9 shrink-0 cursor-pointer rounded-md border bg-background p-1"
+                                        disabled={!isAdmin}
+                                    />
+                                    <Input
+                                        aria-label={t(
                                             'workspace.settings.accent_color',
                                             'Accent Color',
                                         )}
-                                    </Label>
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            type="color"
-                                            id="accent_color"
-                                            value={
-                                                data.accent_color || '#6366f1'
-                                            }
-                                            onChange={(e) =>
-                                                setData(
-                                                    'accent_color',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="h-10 w-14 cursor-pointer rounded-md border p-1"
-                                            disabled={!isAdmin}
-                                        />
-                                        <Input
-                                            value={data.accent_color || ''}
-                                            onChange={(e) =>
-                                                setData(
-                                                    'accent_color',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="#6366f1"
-                                            className="w-32 font-mono text-sm"
-                                            maxLength={7}
-                                            disabled={!isAdmin}
-                                        />
-                                        {data.accent_color && isAdmin && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    setData('accent_color', '')
-                                                }
-                                            >
-                                                {t(
-                                                    'workspace.settings.reset_color',
-                                                    'Reset',
-                                                )}
-                                            </Button>
-                                        )}
-                                    </div>
-                                    <InputError message={errors.accent_color} />
+                                        value={data.accent_color || ''}
+                                        onChange={(e) =>
+                                            setData(
+                                                'accent_color',
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="#6366f1"
+                                        maxLength={7}
+                                        className="font-mono uppercase"
+                                        disabled={!isAdmin}
+                                    />
                                 </div>
-
-                                {/* Preset Colors */}
-                                {isAdmin && (
-                                    <div className="space-y-2">
-                                        <Label className="text-xs text-muted-foreground">
-                                            {t(
-                                                'workspace.settings.preset_colors',
-                                                'Presets',
-                                            )}
-                                        </Label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {[
-                                                '#6366f1',
-                                                '#8b5cf6',
-                                                '#ec4899',
-                                                '#ef4444',
-                                                '#f97316',
-                                                '#eab308',
-                                                '#22c55e',
-                                                '#06b6d4',
-                                                '#3b82f6',
-                                                '#64748b',
-                                            ].map((color) => (
-                                                <button
-                                                    key={color}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setData(
-                                                            'accent_color',
-                                                            color,
-                                                        )
-                                                    }
-                                                    className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none ${
-                                                        data.accent_color ===
-                                                        color
-                                                            ? 'scale-110 border-foreground shadow-md ring-2 ring-primary ring-offset-2'
-                                                            : 'border-transparent hover:border-foreground/50'
-                                                    }`}
-                                                    style={{
-                                                        backgroundColor: color,
-                                                    }}
-                                                    title={color}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Live Preview */}
-                                {data.accent_color && (
-                                    <div className="rounded-lg border p-4">
-                                        <p className="mb-2 text-xs font-medium text-muted-foreground">
-                                            {t(
-                                                'workspace.settings.preview',
-                                                'Preview',
-                                            )}
-                                        </p>
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="h-8 w-8 rounded-lg"
-                                                style={{
-                                                    backgroundColor:
-                                                        data.accent_color,
-                                                }}
-                                            />
-                                            <div>
-                                                <p
-                                                    className="text-sm font-medium"
-                                                    style={{
-                                                        color: data.accent_color,
-                                                    }}
-                                                >
-                                                    {workspace.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {t(
-                                                        'workspace.settings.preview_example',
-                                                        'Your brand color in action',
-                                                    )}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {isAdmin && (
-                                    <Button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            router.put(
-                                                '/workspaces/settings',
-                                                data,
-                                                {
-                                                    forceFormData: true,
-                                                    preserveScroll: true,
-                                                },
-                                            );
-                                        }}
-                                        disabled={processing || !isDirty}
-                                        className={!isDirty ? 'opacity-50' : ''}
-                                    >
-                                        {processing && (
-                                            <Spinner className="mr-2" />
-                                        )}
-                                        {t(
-                                            'workspace.settings.save_branding',
-                                            'Save Branding',
-                                        )}
-                                    </Button>
-                                )}
+                                <InputError message={errors.accent_color} />
                             </div>
-                        </CardContent>
-                    </Card>
 
-                    {/* Billing Email */}
-                    {isAdmin && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    {t(
-                                        'workspace.settings.billing_email',
-                                        'Billing Email',
-                                    )}
-                                </CardTitle>
-                                <CardDescription>
-                                    {t(
-                                        'workspace.settings.billing_email_desc',
-                                        "Override the email address for billing receipts and invoices. Leave blank to use the workspace owner's email.",
-                                    )}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="billing_email">
-                                            {t(
-                                                'workspace.settings.billing_email_label',
-                                                'Billing Email Address',
-                                            )}
-                                        </Label>
-                                        <Input
-                                            id="billing_email"
-                                            type="email"
-                                            value={data.billing_email}
-                                            onChange={(e) =>
-                                                setData(
-                                                    'billing_email',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder={t(
-                                                'workspace.settings.billing_email_placeholder',
-                                                'billing@yourcompany.com',
-                                            )}
-                                            disabled={!isAdmin}
-                                        />
-                                        <InputError
-                                            message={errors.billing_email}
-                                        />
-                                        <p className="text-xs text-muted-foreground">
-                                            {t(
-                                                'workspace.settings.billing_email_help',
-                                                "This email will receive invoices and payment notifications instead of the owner's email.",
-                                            )}
-                                        </p>
-                                    </div>
-                                    <Button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            router.put(
-                                                '/workspaces/settings',
-                                                data,
-                                                {
-                                                    forceFormData: true,
-                                                    preserveScroll: true,
-                                                },
-                                            );
-                                        }}
-                                        disabled={processing || !isDirty}
-                                    >
-                                        {processing && (
-                                            <Spinner className="mr-2" />
-                                        )}
+                            {isAdmin && (
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs text-muted-foreground">
                                         {t(
-                                            'workspace.settings.save_billing',
-                                            'Save Billing Settings',
+                                            'workspace.settings.preset_colors',
+                                            'Presets',
                                         )}
-                                    </Button>
+                                    </span>
+                                    <div className="flex flex-wrap gap-2.5">
+                                        {presetColors.map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                aria-label={color}
+                                                aria-pressed={
+                                                    data.accent_color === color
+                                                }
+                                                onClick={() =>
+                                                    setData(
+                                                        'accent_color',
+                                                        color,
+                                                    )
+                                                }
+                                                className={cn(
+                                                    'size-[30px] rounded-full transition-transform hover:scale-110',
+                                                    data.accent_color ===
+                                                        color &&
+                                                        'ring-2 ring-foreground ring-offset-2 ring-offset-card',
+                                                )}
+                                                style={{
+                                                    backgroundColor: color,
+                                                }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    )}
+                            )}
+                        </div>
 
-                    {/* Data Management */}
+                        <div className="flex flex-col gap-2">
+                            <span className="text-xs text-muted-foreground">
+                                {t('workspace.settings.preview', 'Preview')}
+                            </span>
+                            <div className="flex flex-col gap-3 rounded-[14px] border bg-background p-4">
+                                <div className="flex items-center gap-3">
+                                    <span
+                                        className="size-10 shrink-0 rounded-[10px] transition-colors"
+                                        style={{
+                                            backgroundColor: previewColor,
+                                        }}
+                                    />
+                                    <div className="flex min-w-0 flex-col">
+                                        <span
+                                            className="truncate text-[15px] font-bold"
+                                            style={{ color: previewColor }}
+                                        >
+                                            {data.name || workspace.name}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {t(
+                                                'workspace.settings.preview_example',
+                                                'Your brand color in action',
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <span
+                                        className="rounded-lg px-3.5 py-2 text-[13px] font-semibold text-white"
+                                        style={{
+                                            backgroundColor: previewColor,
+                                        }}
+                                    >
+                                        {t(
+                                            'workspace.settings.preview_primary',
+                                            'Primary action',
+                                        )}
+                                    </span>
+                                    <span
+                                        className="rounded-lg border px-3.5 py-2 text-[13px] font-semibold"
+                                        style={{
+                                            borderColor: previewColor,
+                                            color: previewColor,
+                                        }}
+                                    >
+                                        {t(
+                                            'workspace.settings.preview_secondary',
+                                            'Secondary',
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Billing Email */}
+                {isAdmin && (
                     <Card>
                         <CardHeader>
-                            <CardTitle>
+                            <CardTitle className="text-[17px]">
                                 {t(
-                                    'workspace.settings.data_management',
-                                    'Data Management',
+                                    'workspace.settings.billing_email',
+                                    'Billing Email',
                                 )}
                             </CardTitle>
                             <CardDescription>
                                 {t(
-                                    'workspace.settings.data_management_description',
-                                    'Export your workspace data for GDPR compliance or backup.',
+                                    'workspace.settings.billing_email_desc',
+                                    "Override the email address for billing receipts and invoices. Leave blank to use the workspace owner's email.",
                                 )}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-1">
-                                    <p className="text-sm font-medium">
+                            <div className="flex max-w-lg flex-col gap-2">
+                                <Label htmlFor="billing_email">
+                                    {t(
+                                        'workspace.settings.billing_email_label',
+                                        'Billing Email Address',
+                                    )}
+                                </Label>
+                                <Input
+                                    id="billing_email"
+                                    type="email"
+                                    value={data.billing_email}
+                                    onChange={(e) =>
+                                        setData('billing_email', e.target.value)
+                                    }
+                                    placeholder={t(
+                                        'workspace.settings.billing_email_placeholder',
+                                        'billing@yourcompany.com',
+                                    )}
+                                    disabled={!isAdmin}
+                                />
+                                <InputError message={errors.billing_email} />
+                                <p className="text-[13px] text-muted-foreground">
+                                    {t(
+                                        'workspace.settings.billing_email_help',
+                                        "This email will receive invoices and payment notifications instead of the owner's email.",
+                                    )}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Data Management */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-[17px]">
+                            {t(
+                                'workspace.settings.data_management',
+                                'Data Management',
+                            )}
+                        </CardTitle>
+                        <CardDescription>
+                            {t(
+                                'workspace.settings.data_management_description',
+                                'Export your workspace data for GDPR compliance or backup.',
+                            )}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-wrap items-center justify-between gap-3.5 rounded-xl bg-muted px-4 py-3.5">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-sm font-semibold">
+                                    {t(
+                                        'workspace.settings.export_data',
+                                        'Export Workspace Data',
+                                    )}
+                                </span>
+                                <span className="text-[13px] text-muted-foreground">
+                                    {t(
+                                        'workspace.settings.export_data_description',
+                                        'Download all workspace data, members, and activity logs in JSON format.',
+                                    )}
+                                </span>
+                            </div>
+                            <Button variant="outline" onClick={handleExport}>
+                                <Download />
+                                {t(
+                                    'workspace.settings.export_button',
+                                    'Export JSON',
+                                )}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Danger Zone */}
+                {isOwner && !workspace.personal_workspace && (
+                    <Card className="border-destructive/40">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-[17px] text-destructive">
+                                <AlertTriangle className="size-[18px]" />
+                                {t(
+                                    'workspace.settings.danger_zone',
+                                    'Danger Zone',
+                                )}
+                            </CardTitle>
+                            <CardDescription>
+                                {t(
+                                    'workspace.settings.delete_description',
+                                    'Once you delete a workspace, there is no going back. Please be certain.',
+                                )}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap items-end gap-3 rounded-xl bg-destructive/5 p-4">
+                                <div className="flex min-w-64 flex-1 flex-col gap-2">
+                                    <Label htmlFor="delete-confirm">
                                         {t(
-                                            'workspace.settings.export_data',
-                                            'Export Workspace Data',
+                                            'workspace.settings.delete_confirm',
+                                            'Type the workspace name to confirm deletion',
                                         )}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {t(
-                                            'workspace.settings.export_description',
-                                            'Download all workspace data, members, and activity logs in JSON format.',
-                                        )}
-                                    </p>
+                                    </Label>
+                                    <Input
+                                        id="delete-confirm"
+                                        value={deleteConfirm}
+                                        onChange={(e) =>
+                                            setDeleteConfirm(e.target.value)
+                                        }
+                                        placeholder={workspace.name}
+                                        className="bg-card"
+                                    />
                                 </div>
                                 <Button
-                                    variant="outline"
-                                    onClick={handleExport}
+                                    variant="destructive"
+                                    onClick={handleDelete}
+                                    disabled={deleteConfirm !== workspace.name}
                                 >
-                                    <Download className="mr-2 h-4 w-4" />
+                                    <Trash2 />
                                     {t(
-                                        'workspace.settings.export_button',
-                                        'Export JSON',
+                                        'workspace.settings.delete_button',
+                                        'Delete Workspace',
                                     )}
                                 </Button>
                             </div>
                         </CardContent>
                     </Card>
+                )}
 
-                    {/* Danger Zone */}
-                    {isOwner && !workspace.personal_workspace && (
-                        <Card className="border-destructive">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-destructive">
-                                    <AlertTriangle className="h-5 w-5" />
-                                    {t(
-                                        'workspace.settings.danger_zone',
-                                        'Danger Zone',
-                                    )}
-                                </CardTitle>
-                                <CardDescription>
-                                    {t(
-                                        'workspace.settings.delete_description',
-                                        'Once you delete a workspace, there is no going back. Please be certain.',
-                                    )}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="mb-4 text-sm text-muted-foreground">
-                                    {t(
-                                        'workspace.settings.delete_description',
-                                        'Once you delete a workspace, there is no going back. Please be certain.',
-                                    )}
-                                </p>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="delete-confirm">
-                                            {t(
-                                                'workspace.settings.delete_confirm',
-                                                'Type the workspace name to confirm deletion',
-                                            )}
-                                        </Label>
-                                        <Input
-                                            id="delete-confirm"
-                                            value={deleteConfirm}
-                                            onChange={(e) =>
-                                                setDeleteConfirm(e.target.value)
-                                            }
-                                            placeholder={workspace.name}
-                                        />
-                                    </div>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={handleDelete}
-                                        disabled={
-                                            deleteConfirm !== workspace.name
-                                        }
-                                    >
-                                        {t(
-                                            'workspace.settings.delete_button',
-                                            'Delete Workspace',
-                                        )}
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
+                {workspace.personal_workspace && (
+                    <section className="flex items-center gap-3.5 rounded-2xl border border-dashed bg-card px-5 py-4">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-[11px] bg-muted text-muted-foreground">
+                            <Lock className="size-[18px]" />
+                        </span>
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-[15px] font-bold">
+                                {t(
+                                    'workspace.settings.danger_zone',
+                                    'Danger Zone',
+                                )}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                                {t(
+                                    'workspace.settings.personal_workspace',
+                                    'This is your personal workspace and cannot be deleted.',
+                                )}
+                            </span>
+                        </div>
+                    </section>
+                )}
 
-                    {workspace.personal_workspace && (
-                        <Card className="border-muted">
-                            <CardContent className="py-6">
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'workspace.settings.personal_workspace',
-                                        'This is your personal workspace and cannot be deleted.',
-                                    )}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
+                {/* Unsaved changes bar */}
+                {isAdmin && isDirty && (
+                    <div
+                        role="status"
+                        className="dark sticky bottom-4 z-20 flex animate-rise flex-wrap items-center justify-between gap-3 rounded-[14px] border bg-ink py-3 pr-3 pl-[18px] text-foreground shadow-[0_24px_50px_-20px_rgb(0_0_0/0.55)]"
+                    >
+                        <span className="flex items-center gap-2.5 text-sm">
+                            <span className="size-2 rounded-full bg-amber-300" />
+                            {t(
+                                'workspace.settings.unsaved_changes',
+                                'You have unsaved changes',
+                            )}
+                        </span>
+                        <span className="flex gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => reset()}
+                                disabled={processing}
+                            >
+                                {t('workspace.settings.discard', 'Discard')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                form="workspace-settings-form"
+                                disabled={processing}
+                            >
+                                {processing && <Spinner />}
+                                {t('workspace.settings.save', 'Save Changes')}
+                            </Button>
+                        </span>
+                    </div>
+                )}
             </WorkspaceLayout>
         </AppLayout>
     );

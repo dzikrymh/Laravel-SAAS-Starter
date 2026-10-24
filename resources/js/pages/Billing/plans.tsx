@@ -1,23 +1,29 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/components/ui/toast';
 import { useTranslations } from '@/hooks/use-translations';
 import AppLayout from '@/layouts/app-layout';
 import WorkspaceLayout from '@/layouts/settings/workspace-layout';
 import http from '@/lib/http';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type Plan, type WorkspaceRole } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { Check, Sparkles } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    Check,
+    CreditCard,
+    Lock,
+    Plus,
+    Sparkles,
+    Zap,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface PlansPageProps {
@@ -44,6 +50,7 @@ export default function PlansPage({
         recommendedBillingPeriod || currentBillingPeriod || 'monthly',
     );
     const [processing, setProcessing] = useState<string | null>(null);
+    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
     const { addToast } = useToast();
     const isOwner = userRole === 'owner';
 
@@ -161,10 +168,73 @@ export default function PlansPage({
         return t('billing.plans.change_billing_period', 'Switch Plan');
     };
 
+    const formatLimit = (value: number) =>
+        value === -1 ? '∞' : value.toLocaleString();
+
+    const limitRows: { label: string; value: (plan: Plan) => string }[] = [
+        {
+            label: t('billing.plans.limits.workspaces', 'Workspaces'),
+            value: (plan) => formatLimit(plan.limits.workspaces),
+        },
+        {
+            label: t('billing.plans.limits.team_members', 'Team members'),
+            value: (plan) => formatLimit(plan.limits.team_members),
+        },
+        {
+            label: t('billing.plans.limits.api_keys', 'API keys'),
+            value: (plan) => formatLimit(plan.limits.api_keys),
+        },
+        {
+            label: t('billing.plans.limits.webhooks', 'Webhooks'),
+            value: (plan) => formatLimit(plan.limits.webhooks),
+        },
+        {
+            label: t('billing.plans.limits.api_requests', 'API requests / min'),
+            value: (plan) => formatLimit(plan.api_requests_per_minute),
+        },
+    ];
+
+    const faqs = [
+        {
+            question: t(
+                'billing.plans.faq.change_plans',
+                'Can I change plans later?',
+            ),
+            answer: t(
+                'billing.plans.faq.change_plans_answer',
+                'Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately and are prorated.',
+            ),
+        },
+        {
+            question: t(
+                'billing.plans.faq.payment_methods',
+                'What payment methods do you accept?',
+            ),
+            answer: t(
+                'billing.plans.faq.payment_methods_answer',
+                'We accept all major credit cards (Visa, MasterCard, American Express) through our secure payment processor, Stripe.',
+            ),
+        },
+        {
+            question: t(
+                'billing.plans.faq.cancel',
+                'Can I cancel my subscription?',
+            ),
+            answer: t(
+                'billing.plans.faq.cancel_answer',
+                "Yes, you can cancel your subscription at any time. You'll continue to have access to paid features until the end of your billing period.",
+            ),
+        },
+    ];
+
+    const currentPlanName =
+        plans.find((plan) => plan.id === currentPlan)?.name ?? currentPlan;
+    const highlightedPlanId =
+        recommendedPlan ?? plans.find((plan) => plan.popular)?.id;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('billing.plans.title', 'Pricing Plans')} />
-
             <WorkspaceLayout
                 title={t('billing.plans.title', 'Pricing Plans')}
                 description={t(
@@ -172,275 +242,383 @@ export default function PlansPage({
                     'Choose the plan that best fits your needs.',
                 )}
                 fullWidth
+                actions={
+                    <Button variant="outline" asChild>
+                        <Link href="/billing">
+                            <ArrowLeft />
+                            {t('billing.plans.back', 'Back to Billing')}
+                        </Link>
+                    </Button>
+                }
             >
-                <div className="space-y-6">
-                    {fromOnboarding && recommendedPlan && (
-                        <Card className="border-primary/40 bg-primary/5">
-                            <CardContent className="py-4">
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'billing.plans.onboarding_hint',
-                                        'You chose the {{plan}} plan during onboarding. Complete your subscription below or pick a different option.',
-                                        {
-                                            plan:
-                                                recommendedPlan
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                recommendedPlan.slice(1),
-                                        },
-                                    )}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Billing Period Toggle */}
-                    <div className="animate-fade-in-up flex items-center justify-center gap-4">
-                        <Label
-                            htmlFor="billing-monthly"
-                            className={`cursor-pointer transition-colors duration-300 ${billingPeriod === 'monthly' ? 'font-bold text-foreground' : 'text-muted-foreground/60 hover:text-muted-foreground'}`}
-                        >
-                            {t('billing.plans.monthly', 'Monthly')}
-                        </Label>
-                        <button
-                            type="button"
-                            role="switch"
-                            aria-checked={billingPeriod === 'yearly'}
-                            onClick={() =>
-                                setBillingPeriod(
-                                    billingPeriod === 'monthly'
-                                        ? 'yearly'
-                                        : 'monthly',
-                                )
-                            }
-                            className={`relative inline-flex h-7 w-14 items-center rounded-full shadow-inner transition-all duration-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none ${
-                                billingPeriod === 'yearly'
-                                    ? 'bg-primary'
-                                    : 'bg-input'
-                            }`}
-                        >
-                            <span
-                                className={`inline-block h-5 w-5 rounded-full bg-background shadow-md transition-transform duration-500 ease-in-out ${
-                                    billingPeriod === 'yearly'
-                                        ? 'translate-x-8'
-                                        : 'translate-x-1'
-                                }`}
-                            />
-                        </button>
-                        <Label
-                            htmlFor="billing-yearly"
-                            className={`flex cursor-pointer items-center gap-2 transition-colors duration-300 ${billingPeriod === 'yearly' ? 'font-bold text-foreground' : 'text-muted-foreground/60 hover:text-muted-foreground'}`}
-                        >
-                            Yearly
-                            <Badge
-                                variant="secondary"
-                                className="animate-pulse border-none bg-primary/10 font-bold text-primary"
-                            >
-                                Save 17%
-                            </Badge>
-                        </Label>
+                {fromOnboarding && recommendedPlan && (
+                    <div className="flex items-center gap-2.5 rounded-[14px] border border-primary/25 bg-accent px-4 py-3 text-sm text-accent-foreground">
+                        <Sparkles className="size-4 shrink-0" />
+                        {t(
+                            'billing.plans.onboarding_hint',
+                            'You chose the {{plan}} plan during onboarding. Complete your subscription below or pick a different option.',
+                            {
+                                plan:
+                                    recommendedPlan.charAt(0).toUpperCase() +
+                                    recommendedPlan.slice(1),
+                            },
+                        )}
                     </div>
+                )}
 
-                    {/* Plans Grid */}
-                    <div className="mx-auto grid max-w-7xl gap-8 pb-12 md:grid-cols-3">
-                        {plans.map((plan, index) => (
-                            <Card
+                {!isOwner && (
+                    <div className="flex items-center gap-2.5 rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+                        <Lock className="size-4 shrink-0" />
+                        {t(
+                            'billing.plans.only_owner',
+                            'Only the workspace owner can manage billing and subscriptions.',
+                        )}
+                    </div>
+                )}
+
+                {/* Billing Period Toggle */}
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border bg-card px-4 py-3.5">
+                    <span className="flex items-center gap-2.5 text-sm">
+                        <CreditCard className="size-4 text-highlight" />
+                        <span>
+                            {t('billing.plans.on_plan', "You're on")}{' '}
+                            <b className="font-semibold">{currentPlanName}</b>{' '}
+                            <span className="text-muted-foreground">
+                                ·{' '}
+                                {t(
+                                    'billing.plans.prorated_hint',
+                                    'changes are prorated and take effect immediately.',
+                                )}
+                            </span>
+                        </span>
+                    </span>
+                    <div className="flex items-center gap-2.5">
+                        <div
+                            role="radiogroup"
+                            aria-label={t(
+                                'billing.plans.billing_period',
+                                'Billing period',
+                            )}
+                            className="inline-flex rounded-[10px] border bg-muted p-[3px]"
+                        >
+                            {(['monthly', 'yearly'] as const).map((period) => (
+                                <button
+                                    key={period}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={billingPeriod === period}
+                                    onClick={() => setBillingPeriod(period)}
+                                    className={cn(
+                                        'min-h-8 rounded-lg px-3.5 text-[13px] font-semibold transition-colors',
+                                        billingPeriod === period
+                                            ? 'bg-card text-foreground shadow-xs'
+                                            : 'text-muted-foreground hover:text-foreground',
+                                    )}
+                                >
+                                    {period === 'monthly'
+                                        ? t('billing.plans.monthly', 'Monthly')
+                                        : t('billing.plans.yearly', 'Yearly')}
+                                </button>
+                            ))}
+                        </div>
+                        <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                            {t('billing.plans.save_yearly', 'Save 17%')}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Plans Grid */}
+                <div className="grid items-stretch gap-4 md:grid-cols-3">
+                    {plans.map((plan, index) => {
+                        const isCurrent = isExactCurrentPlan(plan);
+                        const isHighlighted =
+                            !isCurrent && plan.id === highlightedPlanId;
+                        const price =
+                            billingPeriod === 'monthly'
+                                ? plan.price.monthly
+                                : plan.price.yearly;
+                        const yearlyMonthlyEquivalent =
+                            plan.price.yearly > 0
+                                ? (plan.price.yearly / 12).toFixed(2)
+                                : null;
+
+                        return (
+                            <section
                                 key={plan.id}
-                                className={`glass animate-fade-in-up relative flex flex-col border-primary/20 transition-all duration-500 hover:scale-105 hover:border-primary active:scale-95 delay-${(index + 1) * 100} ${
-                                    isExactCurrentPlan(plan)
-                                        ? 'z-10 border-primary shadow-md ring-2 ring-primary/20'
-                                        : recommendedPlan === plan.id
-                                          ? 'border-primary/50 shadow-xl'
-                                          : plan.popular
-                                            ? 'border-primary/50 shadow-xl'
-                                            : 'hover:shadow-lg'
-                                }`}
+                                aria-label={plan.name}
+                                style={{
+                                    animationDelay: `${0.05 + index * 0.06}s`,
+                                }}
+                                className={cn(
+                                    'relative flex animate-rise flex-col gap-[18px] overflow-hidden rounded-[18px] border p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1',
+                                    isHighlighted
+                                        ? 'dark border-white/10 bg-ink text-foreground shadow-[0_30px_60px_-30px_rgb(31_67_214/0.6)]'
+                                        : 'bg-card',
+                                    isCurrent && 'border-2 border-primary',
+                                )}
                             >
-                                {isExactCurrentPlan(plan) ? (
-                                    <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
-                                        <Badge
-                                            variant="default"
-                                            className="gap-1 bg-green-600 px-3 py-1 font-bold shadow-lg"
-                                        >
-                                            <Check className="h-3.5 w-3.5 stroke-[3]" />
+                                {isHighlighted && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute -top-28 -right-24 h-72 w-80 bg-[radial-gradient(closest-side,rgb(61_99_245/0.55),transparent)] blur-xl"
+                                    />
+                                )}
+
+                                <div className="relative flex items-center justify-between gap-2">
+                                    <h2 className="text-lg font-bold">
+                                        {plan.name}
+                                    </h2>
+                                    {isCurrent ? (
+                                        <span className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-accent-foreground">
+                                            <Check className="size-3.5 stroke-[3]" />
                                             {t(
                                                 'billing.plans.your_plan',
                                                 'Your Plan',
                                             )}
-                                        </Badge>
-                                    </div>
-                                ) : (
-                                    plan.popular && (
-                                        <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
-                                            <Badge className="animate-pulse-premium gap-1 bg-primary px-3 py-1 font-bold shadow-lg">
-                                                <Sparkles className="h-3.5 w-3.5" />
+                                        </span>
+                                    ) : (
+                                        plan.popular && (
+                                            <span className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground">
+                                                <Sparkles className="size-3.5" />
                                                 {t(
                                                     'billing.plans.most_popular',
                                                     'Most Popular',
                                                 )}
-                                            </Badge>
-                                        </div>
-                                    )
-                                )}
-                                <CardHeader className="pt-8 text-center">
-                                    <CardTitle className="text-2xl font-black tracking-tight">
-                                        {plan.name}
-                                    </CardTitle>
-                                    <CardDescription className="font-medium text-muted-foreground/80">
-                                        {plan.description}
-                                    </CardDescription>
-                                    <div className="mt-6">
-                                        <span className="text-5xl font-black tracking-tighter">
-                                            $
-                                            {billingPeriod === 'monthly'
-                                                ? plan.price.monthly
-                                                : plan.price.yearly}
+                                            </span>
+                                        )
+                                    )}
+                                </div>
+                                <p className="relative text-sm text-muted-foreground">
+                                    {plan.description}
+                                </p>
+
+                                <div className="relative flex flex-col gap-0.5">
+                                    <span className="flex items-baseline gap-1">
+                                        <span className="text-[40px] leading-none font-extrabold tracking-[-0.03em]">
+                                            ${price}
                                         </span>
-                                        <span className="text-lg font-bold text-muted-foreground">
+                                        <span className="text-sm text-muted-foreground">
                                             /
                                             {billingPeriod === 'monthly'
                                                 ? t('common.mo', 'mo')
                                                 : t('common.yr', 'yr')}
                                         </span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex-1 px-8 pt-4">
-                                    <ul className="space-y-4">
-                                        {plan.features.map((feature, index) => (
-                                            <li
-                                                key={index}
-                                                className="flex items-start gap-3 text-sm font-medium text-foreground/80"
-                                            >
-                                                <div className="mt-0.5 rounded-full bg-green-100 p-0.5 dark:bg-green-900/30">
-                                                    <Check className="h-3.5 w-3.5 stroke-[3] text-green-600 dark:text-green-400" />
-                                                </div>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                                <CardFooter className="px-8 pb-8">
-                                    {plan.id === 'free' ? (
-                                        <Button
-                                            variant="outline"
-                                            className="h-12 w-full rounded-md font-bold transition-all hover:bg-muted"
-                                            disabled={
-                                                currentPlan === 'free' ||
-                                                !isOwner ||
-                                                processing !== null
-                                            }
-                                            onClick={handleCancelSubscription}
-                                        >
-                                            {processing === 'free' && (
-                                                <Spinner className="mr-2" />
-                                            )}
-                                            {getButtonText(plan)}
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant={
-                                                isExactCurrentPlan(plan)
-                                                    ? 'secondary'
-                                                    : plan.popular
-                                                      ? 'default'
-                                                      : 'outline'
-                                            }
-                                            className={`h-12 w-full rounded-md font-bold transition-all active:scale-95 ${
-                                                !isExactCurrentPlan(plan) &&
-                                                (plan.popular ||
-                                                    plan.id === recommendedPlan)
-                                                    ? 'animate-pulse-premium border-none px-8 shadow-lg shadow-primary/20'
-                                                    : ''
-                                            }`}
-                                            disabled={
-                                                isExactCurrentPlan(plan) ||
-                                                !isOwner ||
-                                                processing !== null
-                                            }
-                                            onClick={() =>
-                                                handleSubscribe(plan.id)
-                                            }
-                                        >
-                                            {processing === plan.id && (
-                                                <Spinner className="mr-2" />
-                                            )}
-                                            {getButtonText(plan)}
-                                        </Button>
-                                    )}
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
+                                    </span>
+                                    <span className="min-h-4 text-xs text-highlight">
+                                        {yearlyMonthlyEquivalent &&
+                                            (billingPeriod === 'yearly'
+                                                ? t(
+                                                      'billing.plans.per_month_equivalent',
+                                                      '≈ ${{amount}}/mo billed yearly',
+                                                      {
+                                                          amount: yearlyMonthlyEquivalent,
+                                                      },
+                                                  )
+                                                : t(
+                                                      'billing.plans.or_yearly',
+                                                      'or ${{amount}} billed yearly',
+                                                      {
+                                                          amount: plan.price
+                                                              .yearly,
+                                                      },
+                                                  ))}
+                                    </span>
+                                </div>
 
-                    {/* FAQ or Additional Info */}
-                    <Card className="mt-8">
-                        <CardHeader>
-                            <CardTitle>
-                                {t(
-                                    'billing.plans.faq.title',
-                                    'Frequently Asked Questions',
+                                {plan.id === 'free' ? (
+                                    <Button
+                                        variant="outline"
+                                        className="relative w-full"
+                                        disabled={
+                                            currentPlan === 'free' ||
+                                            !isOwner ||
+                                            processing !== null
+                                        }
+                                        onClick={handleCancelSubscription}
+                                    >
+                                        {processing === 'free' ? (
+                                            <Spinner />
+                                        ) : (
+                                            currentPlan === 'free' && <Check />
+                                        )}
+                                        {getButtonText(plan)}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant={
+                                            isCurrent
+                                                ? 'secondary'
+                                                : isHighlighted
+                                                  ? 'default'
+                                                  : 'outline'
+                                        }
+                                        className="relative w-full"
+                                        disabled={
+                                            isCurrent ||
+                                            !isOwner ||
+                                            processing !== null
+                                        }
+                                        onClick={() => handleSubscribe(plan.id)}
+                                    >
+                                        {processing === plan.id ? (
+                                            <Spinner />
+                                        ) : (
+                                            !isCurrent && <Zap />
+                                        )}
+                                        {getButtonText(plan)}
+                                    </Button>
                                 )}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <h4 className="font-medium">
-                                    {t(
-                                        'billing.plans.faq.change_plans',
-                                        'Can I change plans later?',
-                                    )}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'billing.plans.faq.change_plans_answer',
-                                        'Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately and are prorated.',
-                                    )}
-                                </p>
-                            </div>
-                            <div>
-                                <h4 className="font-medium">
-                                    {t(
-                                        'billing.plans.faq.payment_methods',
-                                        'What payment methods do you accept?',
-                                    )}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'billing.plans.faq.payment_methods_answer',
-                                        'We accept all major credit cards (Visa, MasterCard, American Express) through our secure payment processor, Stripe.',
-                                    )}
-                                </p>
-                            </div>
-                            <div>
-                                <h4 className="font-medium">
-                                    {t(
-                                        'billing.plans.faq.cancel',
-                                        'Can I cancel my subscription?',
-                                    )}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'billing.plans.faq.cancel_answer',
-                                        "Yes, you can cancel your subscription at any time. You'll continue to have access to paid features until the end of your billing period.",
-                                    )}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
 
-                    {!isOwner && (
-                        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/50">
-                            <CardContent className="py-4">
-                                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                                    {t(
-                                        'billing.plans.only_owner',
-                                        'Only the workspace owner can manage billing and subscriptions.',
-                                    )}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    )}
+                                <div className="relative h-px bg-border" />
+
+                                <ul className="relative flex flex-1 flex-col gap-2.5">
+                                    {plan.features.map((feature) => (
+                                        <li
+                                            key={feature}
+                                            className="flex items-start gap-2.5 text-sm"
+                                        >
+                                            <Check className="mt-0.5 size-4 shrink-0 stroke-[2.5] text-emerald-600 dark:text-emerald-400" />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+                        );
+                    })}
                 </div>
+
+                {/* Limits comparison */}
+                <Card className="gap-4">
+                    <CardHeader>
+                        <CardTitle className="text-[17px]">
+                            {t(
+                                'billing.plans.compare_limits',
+                                'Compare limits',
+                            )}
+                        </CardTitle>
+                        <CardDescription>
+                            {t(
+                                'billing.plans.compare_limits_description',
+                                'What each plan allows per workspace.',
+                            )}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="overflow-x-auto px-0">
+                        <table className="w-full min-w-[520px] border-collapse text-sm">
+                            <thead>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="border-b px-6 py-2.5 text-left text-xs font-semibold tracking-[0.04em] text-muted-foreground"
+                                    >
+                                        {t('billing.plans.limit', 'Limit')}
+                                    </th>
+                                    {plans.map((plan) => (
+                                        <th
+                                            key={plan.id}
+                                            scope="col"
+                                            className={cn(
+                                                'border-b px-4 py-2.5 text-center text-xs font-semibold tracking-[0.04em] text-muted-foreground',
+                                                plan.id === highlightedPlanId &&
+                                                    'bg-accent text-accent-foreground',
+                                            )}
+                                        >
+                                            {plan.name}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {limitRows.map((row) => (
+                                    <tr
+                                        key={row.label}
+                                        className="transition-colors hover:bg-muted/60"
+                                    >
+                                        <th
+                                            scope="row"
+                                            className="border-b px-6 py-3 text-left font-medium text-muted-foreground"
+                                        >
+                                            {row.label}
+                                        </th>
+                                        {plans.map((plan) => (
+                                            <td
+                                                key={plan.id}
+                                                className={cn(
+                                                    'border-b px-4 py-3 text-center font-medium tabular-nums',
+                                                    plan.id ===
+                                                        highlightedPlanId &&
+                                                        'bg-accent font-bold',
+                                                )}
+                                            >
+                                                {row.value(plan)}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </CardContent>
+                </Card>
+
+                {/* FAQ */}
+                <Card className="gap-3">
+                    <CardHeader>
+                        <CardTitle className="text-[17px]">
+                            {t(
+                                'billing.plans.faq.title',
+                                'Frequently Asked Questions',
+                            )}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col border-t">
+                            {faqs.map((faq, index) => {
+                                const isOpen = openFaqIndex === index;
+
+                                return (
+                                    <div
+                                        key={faq.question}
+                                        className="border-b"
+                                    >
+                                        <button
+                                            type="button"
+                                            aria-expanded={isOpen}
+                                            onClick={() =>
+                                                setOpenFaqIndex(
+                                                    isOpen ? null : index,
+                                                )
+                                            }
+                                            className="flex min-h-[52px] w-full items-center justify-between gap-3 text-left text-[15px] font-semibold"
+                                        >
+                                            {faq.question}
+                                            <Plus
+                                                aria-hidden="true"
+                                                className={cn(
+                                                    'size-5 shrink-0 text-highlight transition-transform duration-300',
+                                                    isOpen && 'rotate-45',
+                                                )}
+                                            />
+                                        </button>
+                                        <div
+                                            className={cn(
+                                                'grid transition-[grid-template-rows] duration-300',
+                                                isOpen
+                                                    ? 'grid-rows-[1fr]'
+                                                    : 'grid-rows-[0fr]',
+                                            )}
+                                        >
+                                            <p className="overflow-hidden text-sm leading-relaxed text-muted-foreground">
+                                                <span className="block pb-4">
+                                                    {faq.answer}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
             </WorkspaceLayout>
         </AppLayout>
     );

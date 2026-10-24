@@ -68,8 +68,8 @@ export default function Notifications({
                 )}
             >
                 <form onSubmit={submit} className="space-y-6">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label htmlFor="channel-email">
                                     Email notifications
@@ -93,7 +93,7 @@ export default function Notifications({
                             />
                         </div>
 
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label htmlFor="channel-in-app">
                                     In-app notifications
@@ -118,7 +118,7 @@ export default function Notifications({
                             />
                         </div>
 
-                        <div className="rounded-lg border border-dashed p-4">
+                        <div className="rounded-2xl border border-dashed p-5">
                             <p className="text-sm font-medium">
                                 Notification categories
                             </p>
@@ -127,7 +127,7 @@ export default function Notifications({
                             </p>
                         </div>
 
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label htmlFor="marketing">
                                     {t(
@@ -157,7 +157,7 @@ export default function Notifications({
                             />
                         </div>
 
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label
                                     htmlFor="security"
@@ -191,7 +191,7 @@ export default function Notifications({
                             />
                         </div>
 
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label htmlFor="team">
                                     {t(
@@ -221,7 +221,7 @@ export default function Notifications({
                             />
                         </div>
 
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="space-y-0.5">
                                 <Label
                                     htmlFor="billing"
@@ -280,7 +280,7 @@ export default function Notifications({
                     </div>
                 </form>
 
-                <div className="mt-6 flex items-center justify-between rounded-lg border p-4">
+                <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                     <div className="flex flex-col gap-0.5">
                         <Label>
                             {t(

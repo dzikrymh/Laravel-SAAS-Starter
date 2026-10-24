@@ -128,7 +128,7 @@ export default function WorkspaceSecurity({
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <ShieldCheck className="h-5 w-5 text-indigo-500" />
+                                <ShieldCheck className="h-5 w-5 text-highlight" />
                                 IP Allowlist
                             </CardTitle>
                             <CardDescription>
@@ -177,7 +177,7 @@ export default function WorkspaceSecurity({
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <AtSign className="h-5 w-5 text-violet-500" />
+                                <AtSign className="h-5 w-5 text-highlight" />
                                 Email Domain Restriction
                             </CardTitle>
                             <CardDescription>

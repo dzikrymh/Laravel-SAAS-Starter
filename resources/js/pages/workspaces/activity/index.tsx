@@ -61,10 +61,10 @@ const eventConfig: Record<
     { icon: typeof ActivityIcon; color: string; label: string }
 > = {
     created: { icon: Plus, color: 'text-emerald-500', label: 'Created' },
-    updated: { icon: Edit, color: 'text-blue-500', label: 'Updated' },
+    updated: { icon: Edit, color: 'text-highlight', label: 'Updated' },
     deleted: { icon: Trash2, color: 'text-red-500', label: 'Deleted' },
-    login: { icon: LogIn, color: 'text-indigo-500', label: 'Sign In' },
-    invited: { icon: UserPlus, color: 'text-violet-500', label: 'Invited' },
+    login: { icon: LogIn, color: 'text-highlight', label: 'Sign In' },
+    invited: { icon: UserPlus, color: 'text-highlight', label: 'Invited' },
     billing: { icon: CreditCard, color: 'text-amber-500', label: 'Billing' },
     settings: {
         icon: Settings,

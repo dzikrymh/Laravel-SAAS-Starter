@@ -105,7 +105,7 @@ export default function Profile({
                 )}
                 fullWidth
             >
-                <div className="space-y-6">
+                <section className="flex flex-col gap-5 rounded-2xl border bg-card p-6">
                     <Form
                         {...ProfileController.update.form()}
                         options={{
@@ -451,9 +451,9 @@ export default function Profile({
                             </>
                         )}
                     </Form>
+                </section>
 
-                    <Separator />
-
+                <section className="flex flex-col gap-5 rounded-2xl border bg-card p-6">
                     {/* Appearance / Theme */}
                     <div className="space-y-4">
                         <HeadingSmall
@@ -471,7 +471,7 @@ export default function Profile({
                     <LanguageSwitcher
                         currentLocale={locale || auth.user?.locale || 'en'}
                     />
-                </div>
+                </section>
 
                 <ExportData />
                 <DeleteUser />

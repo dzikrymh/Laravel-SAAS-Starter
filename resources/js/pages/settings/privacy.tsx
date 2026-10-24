@@ -41,8 +41,8 @@ export default function PrivacySettings() {
                 description="Manage your cookie preferences and consent settings."
             >
                 <div className="space-y-6">
-                    <div className="mt-4 max-w-2xl space-y-6">
-                        <div className="flex items-start justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-start justify-between space-x-2 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="flex flex-col gap-1 pr-6">
                                 <Label
                                     htmlFor="necessary"
@@ -58,7 +58,7 @@ export default function PrivacySettings() {
                             <Switch id="necessary" checked={true} disabled />
                         </div>
 
-                        <div className="flex items-start justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+                        <div className="flex items-start justify-between space-x-2 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="flex flex-col gap-1 pr-6">
                                 <Label
                                     htmlFor="analytical"
@@ -85,7 +85,7 @@ export default function PrivacySettings() {
                             />
                         </div>
 
-                        <div className="flex items-start justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+                        <div className="flex items-start justify-between space-x-2 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/40">
                             <div className="flex flex-col gap-1 pr-6">
                                 <Label
                                     htmlFor="marketing"
@@ -111,7 +111,7 @@ export default function PrivacySettings() {
                             />
                         </div>
 
-                        <div className="flex justify-end pt-4">
+                        <div className="flex justify-end pt-2">
                             <Button onClick={handleSave}>
                                 Save Preferences
                             </Button>

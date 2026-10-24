@@ -245,7 +245,7 @@ export default function WorkspaceAnalytics({
                                                 >
                                                     <div className="flex-1" />
                                                     <div
-                                                        className="w-full max-w-[32px] rounded-t bg-blue-500/80 transition-colors group-hover:bg-blue-600"
+                                                        className="w-full max-w-[32px] rounded-t bg-primary/80 transition-colors group-hover:bg-primary"
                                                         style={{
                                                             height: `${Math.max(height, 2)}px`,
                                                         }}

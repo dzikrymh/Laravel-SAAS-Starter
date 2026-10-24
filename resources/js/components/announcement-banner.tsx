@@ -55,7 +55,7 @@ export function AnnouncementBanner() {
 
     return (
         <div
-            className={`relative border-b ${style.bg} ${style.border} ${style.text}`}
+            className={`relative border-b ${style.bg} ${style.border} ${style.text} rounded-t-xl`}
         >
             <div className="mx-auto flex max-w-7xl animate-rise items-center gap-3 px-4 py-2.5 text-sm">
                 <Icon className="h-4 w-4 shrink-0" />

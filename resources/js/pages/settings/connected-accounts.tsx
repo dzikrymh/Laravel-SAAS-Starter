@@ -99,15 +99,15 @@ export default function ConnectedAccounts({ providers, hasPassword }: Props) {
                 title="Connected Accounts"
                 description="Manage your linked social login providers."
             >
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                     {flash?.success && (
-                        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-400">
+                        <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
                             <CheckCircle2 className="h-4 w-4 shrink-0" />
                             {flash.success}
                         </div>
                     )}
                     {flash?.error && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
+                        <div className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                             {flash.error}
                         </div>
                     )}
@@ -124,13 +124,18 @@ export default function ConnectedAccounts({ providers, hasPassword }: Props) {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <span
-                                                className={`flex h-9 w-9 items-center justify-center rounded-lg ${config.color}`}
+                                                className={`flex size-10 items-center justify-center rounded-[11px] ${config.color}`}
                                             >
                                                 {config.icon}
                                             </span>
                                             <div>
-                                                <CardTitle className="text-base">
+                                                <CardTitle className="flex items-center gap-2 text-base">
                                                     {config.label}
+                                                    {connected && (
+                                                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                                                            Connected
+                                                        </span>
+                                                    )}
                                                 </CardTitle>
                                                 <CardDescription>
                                                     {connected

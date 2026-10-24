@@ -59,8 +59,7 @@ export default function WorkspaceDangerZone({
     const { t } = useTranslations();
     const { props } = usePage();
     const flash = props.flash as
-        | { error?: string; success?: string }
-        | undefined;
+        { error?: string; success?: string } | undefined;
     const isOwner = userRole === 'owner';
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [showDeleteForm, setShowDeleteForm] = useState(false);
@@ -104,7 +103,7 @@ export default function WorkspaceDangerZone({
             >
                 <div className="space-y-6">
                     {flash?.error && (
-                        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
+                        <div className="flex items-center gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                             <AlertTriangle className="h-4 w-4 shrink-0" />
                             {flash.error}
                         </div>
@@ -214,7 +213,7 @@ export default function WorkspaceDangerZone({
 
                     {/* Leave Workspace (non-owners only) */}
                     {!isOwner && !workspace.personal_workspace && (
-                        <Card className="border-amber-200 dark:border-amber-900">
+                        <Card className="border-amber-300/70 dark:border-amber-500/30">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-base text-amber-700 dark:text-amber-400">
                                     <LogOut className="h-5 w-5" />
@@ -283,9 +282,9 @@ export default function WorkspaceDangerZone({
 
                     {/* Delete Workspace (owners only) */}
                     {isOwner && !workspace.personal_workspace && (
-                        <Card className="border-red-200 dark:border-red-900">
+                        <Card className="border-destructive/40">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-base text-red-700 dark:text-red-400">
+                                <CardTitle className="flex items-center gap-2 text-base text-destructive">
                                     <Trash2 className="h-5 w-5" />
                                     {t(
                                         'danger_zone.delete_workspace',
@@ -313,8 +312,8 @@ export default function WorkspaceDangerZone({
                                     </Button>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
-                                            <p className="text-sm text-red-700 dark:text-red-400">
+                                        <div className="rounded-lg border border-destructive/25 bg-destructive/5 px-4 py-3">
+                                            <p className="text-sm text-destructive">
                                                 {t(
                                                     'danger_zone.delete_warning',
                                                     'This will permanently delete the workspace, all members, API keys, and webhooks. Type the workspace name to confirm.',
@@ -347,7 +346,7 @@ export default function WorkspaceDangerZone({
                                                     )
                                                 }
                                                 placeholder={workspace.name}
-                                                className="border-red-300 dark:border-red-800"
+                                                className="border-destructive/40"
                                             />
                                         </div>
                                         <div className="flex gap-2">

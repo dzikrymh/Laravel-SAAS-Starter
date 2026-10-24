@@ -57,26 +57,26 @@ export default function TicketShow({ ticket }: ShowProps) {
     const getStatusColor = (status: TicketData['status']) => {
         switch (status) {
             case 'open':
-                return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+                return 'bg-accent text-accent-foreground';
             case 'in_progress':
-                return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300';
+                return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300';
             case 'resolved':
                 return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
             case 'closed':
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+                return 'bg-muted text-muted-foreground';
         }
     };
 
     const getPriorityColor = (priority: TicketData['priority']) => {
         switch (priority) {
             case 'low':
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+                return 'bg-muted text-muted-foreground';
             case 'normal':
-                return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+                return 'bg-accent text-accent-foreground';
             case 'high':
-                return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300';
+                return 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300';
             case 'urgent':
-                return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+                return 'bg-destructive/10 text-destructive';
         }
     };
 
@@ -256,7 +256,7 @@ export default function TicketShow({ ticket }: ShowProps) {
                             </form>
                         </div>
                     ) : (
-                        <div className="mt-8 rounded-lg border border-dashed p-6 text-center text-muted-foreground">
+                        <div className="mt-8 rounded-2xl border border-dashed p-6 text-center text-muted-foreground">
                             This ticket has been closed. If you need further
                             assistance, please open a new ticket.
                         </div>

@@ -32,7 +32,7 @@ export default function Appearance() {
                 )}
                 fullWidth
             >
-                <div className="space-y-6">
+                <div className="flex flex-col gap-5 rounded-2xl border bg-card p-6">
                     <AppearanceTabs />
                 </div>
             </ProfileLayout>

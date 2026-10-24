@@ -66,7 +66,7 @@ const statusConfig = {
     },
     recent: {
         label: 'Recent',
-        className: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+        className: 'bg-accent text-accent-foreground',
     },
     inactive: {
         label: 'Inactive',
@@ -170,7 +170,7 @@ export default function ActivityReport({
                                         'Avg Engagement',
                                     )}
                                 </CardTitle>
-                                <TrendingUp className="h-4 w-4 text-blue-500" />
+                                <TrendingUp className="h-4 w-4 text-highlight" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
@@ -262,7 +262,7 @@ export default function ActivityReport({
                                                         }}
                                                     />
                                                     <div
-                                                        className="w-full max-w-[20px] rounded-b bg-blue-500/80"
+                                                        className="w-full max-w-[20px] rounded-b bg-primary/80"
                                                         style={{
                                                             height: `${loginHeight}px`,
                                                         }}
@@ -282,7 +282,7 @@ export default function ActivityReport({
                                     {t('member_activity.actions', 'Actions')}
                                 </span>
                                 <span className="flex items-center gap-1">
-                                    <span className="inline-block h-2 w-2 rounded bg-blue-500/80" />{' '}
+                                    <span className="inline-block h-2 w-2 rounded bg-primary/80" />{' '}
                                     {t('member_activity.logins', 'Logins')}
                                 </span>
                             </div>
