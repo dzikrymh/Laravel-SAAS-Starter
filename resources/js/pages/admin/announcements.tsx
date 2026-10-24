@@ -55,7 +55,7 @@ const TYPE_ICONS: Record<string, typeof Info> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-    info: 'text-blue-600 dark:text-blue-400',
+    info: 'text-highlight',
     warning: 'text-amber-600 dark:text-amber-400',
     success: 'text-emerald-600 dark:text-emerald-400',
     danger: 'text-red-600 dark:text-red-400',
@@ -73,8 +73,7 @@ const STATUS_CONFIG: Record<
     },
     scheduled: {
         label: 'Scheduled',
-        className:
-            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        className: 'bg-accent text-accent-foreground',
         icon: Clock,
     },
     expired: {
@@ -161,13 +160,13 @@ export default function AdminAnnouncements({ announcements, filter }: Props) {
     return (
         <AdminLayout>
             <Head title="Announcements" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <Megaphone className="h-6 w-6" />
                             Announcements
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             Manage global banners shown to all users
                         </p>

@@ -64,7 +64,7 @@ interface RevenueAnalyticsProps {
 
 const planColors = [
     'bg-emerald-500',
-    'bg-blue-500',
+    'bg-primary',
     'bg-indigo-500',
     'bg-violet-500',
     'bg-amber-500',
@@ -93,13 +93,13 @@ export default function RevenueAnalytics({
     return (
         <AdminLayout>
             <Head title="Revenue Analytics" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <DollarSign className="h-6 w-6" />
                             Revenue Analytics
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             Monitor subscription metrics, revenue, and billing
                             health across the platform.
@@ -152,7 +152,7 @@ export default function RevenueAnalytics({
                                         </p>
                                     )}
                                 </div>
-                                <CreditCard className="h-8 w-8 text-blue-500/30" />
+                                <CreditCard className="h-8 w-8 text-primary/30" />
                             </div>
                         </CardContent>
                     </Card>

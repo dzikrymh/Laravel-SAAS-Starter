@@ -65,9 +65,9 @@ export default function Retention({ policies }: RetentionProps) {
         <AdminLayout>
             <Head title="Data Retention" />
 
-            <div className="space-y-6 p-8">
+            <div className="space-y-6">
                 <div>
-                    <h1 className="flex items-center gap-2 text-2xl font-bold">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <ShieldCheck className="h-6 w-6 text-primary" />
                         Data Retention Policies
                     </h1>

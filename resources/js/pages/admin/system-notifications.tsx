@@ -55,7 +55,7 @@ interface SystemNotificationsProps {
 
 const SEVERITY_STYLES: Record<string, { badge: string; icon: typeof Info }> = {
     info: {
-        badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        badge: 'bg-accent text-accent-foreground',
         icon: Info,
     },
     warning: {
@@ -149,14 +149,14 @@ export default function SystemNotifications({
     return (
         <AdminLayout>
             <Head title="System Alerts" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 {/* Header */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <ShieldAlert className="h-6 w-6" />
                             System Alerts
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             {summary.unread} unread of {summary.total} total
                             notification{summary.total !== 1 ? 's' : ''}
@@ -292,7 +292,7 @@ export default function SystemNotifications({
                                                         : notification.severity ===
                                                             'warning'
                                                           ? 'text-amber-500'
-                                                          : 'text-blue-500'
+                                                          : 'text-highlight'
                                                 }`}
                                             />
                                         </div>

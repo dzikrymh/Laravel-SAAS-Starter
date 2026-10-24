@@ -13,7 +13,7 @@ export default function AdminTwoFactorRequired() {
                 </div>
 
                 <div className="space-y-4">
-                    <h1 className="text-2xl font-bold tracking-tight">
+                    <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         Admin Access Restricted
                     </h1>
                     <p className="text-sm leading-relaxed text-muted-foreground">

@@ -141,10 +141,10 @@ export default function SystemHealth({ failedJobs, stats }: SystemHealthProps) {
         <AdminLayout>
             <Head title="System Health" />
 
-            <div className="space-y-6 p-4 md:p-6 lg:p-8">
+            <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="flex items-center gap-2 text-2xl font-bold">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <Activity className="h-6 w-6 text-primary" />
                             System Health
                         </h1>

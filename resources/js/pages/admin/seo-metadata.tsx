@@ -297,13 +297,13 @@ export default function SeoMetadata({ entries }: Props) {
     return (
         <AdminLayout>
             <Head title="SEO Management" />
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <Globe className="h-6 w-6" />
                             SEO Management
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             Manage meta tags for specific pages or set global
                             fallback defaults.

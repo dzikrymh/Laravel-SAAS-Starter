@@ -99,7 +99,7 @@ export default function Logs({ files, currentFile, logs }: LogsProps) {
                 return (
                     <Badge
                         variant="secondary"
-                        className="flex items-center gap-1 bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-300"
+                        className="flex items-center gap-1 bg-accent text-accent-foreground hover:bg-accent"
                     >
                         <Info className="size-3" /> {level}
                     </Badge>
@@ -143,12 +143,12 @@ export default function Logs({ files, currentFile, logs }: LogsProps) {
         <AdminLayout>
             <Head title="System Logs" />
 
-            <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             System Logs
-                        </h2>
+                        </h1>
                         <p className="text-muted-foreground">
                             View and manage application log files.
                         </p>

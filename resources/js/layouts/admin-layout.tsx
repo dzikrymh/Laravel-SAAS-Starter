@@ -1,4 +1,5 @@
 import { AdminSidebarGroup } from '@/components/admin/admin-sidebar-group';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { ImpersonationBanner } from '@/components/impersonation-banner';
 import { FeatureProvider } from '@/contexts/feature-context';
 import { cn } from '@/lib/utils';
@@ -24,13 +25,13 @@ import {
     Menu,
     MessageSquare,
     Power,
+    RefreshCw,
     ScrollText,
     Search,
     ShieldCheck,
     Terminal,
     Ticket,
     ToggleLeft,
-    TrendingUp,
     Users,
     X,
 } from 'lucide-react';
@@ -78,11 +79,11 @@ function AdminQuickStatsWidget() {
 
     if (!stats) {
         return (
-            <div className="grid grid-cols-3 gap-1 rounded-md border border-sidebar-border bg-sidebar-accent/20 p-2">
+            <div className="grid grid-cols-3 gap-2 rounded-xl border border-sidebar-border bg-card p-3">
                 {[0, 1, 2].map((i) => (
-                    <div key={i} className="flex flex-col items-center gap-0.5">
-                        <div className="h-4 w-8 animate-pulse rounded bg-sidebar-accent/40" />
-                        <div className="h-2.5 w-10 animate-pulse rounded bg-sidebar-accent/30" />
+                    <div key={i} className="flex flex-col gap-1.5">
+                        <div className="h-4 w-10 animate-pulse rounded bg-muted" />
+                        <div className="h-2.5 w-8 animate-pulse rounded bg-muted" />
                     </div>
                 ))}
             </div>
@@ -108,27 +109,31 @@ function AdminQuickStatsWidget() {
     ];
 
     return (
-        <div className="relative rounded-md border border-sidebar-border bg-sidebar-accent/20 p-2">
-            <button
-                onClick={refreshStats}
-                disabled={loading}
-                className="absolute top-1 right-1 rounded p-1 transition-colors hover:bg-sidebar-accent/50"
-                title="Refresh stats"
-            >
-                <TrendingUp
-                    className={cn('size-3', loading && 'animate-spin')}
-                />
-            </button>
-            <div className="grid grid-cols-3 gap-1">
+        <div className="flex flex-col gap-2.5 rounded-xl border border-sidebar-border bg-card p-3">
+            <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                    Platform
+                </span>
+                <button
+                    type="button"
+                    onClick={refreshStats}
+                    disabled={loading}
+                    aria-label="Refresh stats"
+                    title="Refresh stats"
+                    className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                    <RefreshCw
+                        className={cn('size-3.5', loading && 'animate-spin')}
+                    />
+                </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
                 {items.map((item) => (
-                    <div
-                        key={item.label}
-                        className="flex flex-col items-center gap-0.5"
-                    >
-                        <span className="text-sm font-semibold text-sidebar-foreground">
+                    <div key={item.label} className="flex min-w-0 flex-col">
+                        <span className="truncate text-sm font-bold tabular-nums">
                             {item.value}
                         </span>
-                        <span className="text-[10px] text-sidebar-foreground/50">
+                        <span className="text-[11px] text-muted-foreground">
                             {item.label}
                         </span>
                     </div>
@@ -354,6 +359,23 @@ function AdminSearchBar() {
     const [results, setResults] = useState<SearchResults | null>(null);
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Press "/" anywhere (outside form fields) to jump to search
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            const isTyping =
+                target.isContentEditable ||
+                ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+            if (e.key === '/' && !isTyping) {
+                e.preventDefault();
+                inputRef.current?.focus();
+            }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, []);
 
     const fetchResults = useCallback(async (q: string) => {
         if (q.length < 2) {
@@ -400,11 +422,14 @@ function AdminSearchBar() {
     };
 
     return (
-        <div ref={containerRef} className="relative px-3 py-2">
-            <div className="flex items-center gap-2 rounded-md border border-sidebar-border bg-sidebar-accent/30 px-2.5 py-1.5">
-                <Search className="size-3.5 shrink-0 text-sidebar-foreground/50" />
+        <div ref={containerRef} className="relative px-4 pb-2">
+            <label className="flex h-10 items-center gap-2 rounded-[10px] border border-sidebar-border bg-card px-3 transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-4 focus-within:ring-ring/15">
+                <Search className="size-4 shrink-0 text-muted-foreground" />
+                <span className="sr-only">Search users and workspaces</span>
                 <input
-                    className="w-full bg-transparent text-xs text-sidebar-foreground outline-none placeholder:text-sidebar-foreground/50"
+                    ref={inputRef}
+                    type="search"
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                     placeholder="Search users, workspaces…"
                     value={query}
                     onChange={(e) => {
@@ -412,85 +437,127 @@ function AdminSearchBar() {
                         setOpen(true);
                     }}
                     onFocus={() => setOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                            setOpen(false);
+                            inputRef.current?.blur();
+                        }
+                    }}
                 />
-            </div>
+                <kbd className="hidden rounded-[5px] border px-1.5 font-mono text-[11px] text-muted-foreground lg:inline">
+                    /
+                </kbd>
+            </label>
 
             {open && query.length >= 2 && (
-                <div className="absolute top-full right-3 left-3 z-50 mt-1 rounded-md border border-border bg-popover shadow-lg">
+                <div className="absolute top-full right-4 left-4 z-50 mt-1.5 overflow-hidden rounded-xl border bg-popover shadow-[0_20px_45px_-20px_rgb(15_23_41/0.45)]">
                     {!hasResults ? (
-                        <p className="px-3 py-2 text-xs text-muted-foreground">
-                            No results found.
+                        <p className="px-3.5 py-3 text-sm text-muted-foreground">
+                            No results for “{query}”.
                         </p>
                     ) : (
-                        <div className="max-h-80 overflow-y-auto">
-                            {results.users.length > 0 && (
-                                <div>
-                                    <p className="px-3 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                        Users
-                                    </p>
-                                    {results.users.map((u) => (
-                                        <button
-                                            key={u.id}
-                                            onClick={() => navigate(u.url)}
-                                            className="flex w-full flex-col px-3 py-2 text-left text-sm hover:bg-accent"
-                                        >
-                                            <span className="font-medium">
-                                                {u.name}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {u.email}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                            {results.workspaces.length > 0 && (
-                                <div>
-                                    <p className="px-3 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                        Workspaces
-                                    </p>
-                                    {results.workspaces.map((w) => (
-                                        <button
-                                            key={w.id}
-                                            onClick={() => navigate(w.url)}
-                                            className="flex w-full flex-col px-3 py-2 text-left text-sm hover:bg-accent"
-                                        >
-                                            <span className="font-medium">
-                                                {w.name}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {w.slug}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                            {results.subscriptions.length > 0 && (
-                                <div>
-                                    <p className="px-3 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                        Subscriptions
-                                    </p>
-                                    {results.subscriptions.map((s) => (
-                                        <button
-                                            key={s.id}
-                                            onClick={() => navigate(s.url)}
-                                            className="flex w-full flex-col px-3 py-2 text-left text-sm hover:bg-accent"
-                                        >
-                                            <span className="font-medium">
-                                                {s.workspace_name}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {s.stripe_status}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="max-h-80 overflow-y-auto py-1">
+                            {(
+                                [
+                                    {
+                                        label: 'Users',
+                                        items: results.users,
+                                        primary: (r: SearchResult) => r.name,
+                                        secondary: (r: SearchResult) => r.email,
+                                    },
+                                    {
+                                        label: 'Workspaces',
+                                        items: results.workspaces,
+                                        primary: (r: SearchResult) => r.name,
+                                        secondary: (r: SearchResult) => r.slug,
+                                    },
+                                    {
+                                        label: 'Subscriptions',
+                                        items: results.subscriptions,
+                                        primary: (r: SearchResult) =>
+                                            r.workspace_name,
+                                        secondary: (r: SearchResult) =>
+                                            r.stripe_status,
+                                    },
+                                ] as const
+                            )
+                                .filter((group) => group.items.length > 0)
+                                .map((group) => (
+                                    <div key={group.label}>
+                                        <p className="px-3.5 pt-2 pb-1 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                                            {group.label}
+                                        </p>
+                                        {group.items.map((result) => (
+                                            <button
+                                                key={`${group.label}-${result.id}`}
+                                                type="button"
+                                                onClick={() =>
+                                                    navigate(result.url)
+                                                }
+                                                className="flex w-full flex-col px-3.5 py-2 text-left text-sm transition-colors hover:bg-accent"
+                                            >
+                                                <span className="font-medium">
+                                                    {group.primary(result)}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {group.secondary(result)}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ))}
                         </div>
                     )}
                 </div>
             )}
         </div>
+    );
+}
+
+function AdminBrand() {
+    return (
+        <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-ink text-white">
+                <ShieldCheck className="size-4" />
+            </span>
+            <span className="flex flex-col leading-tight">
+                <span className="text-sm font-bold">Admin Panel</span>
+                <span className="text-[11px] text-muted-foreground">
+                    Superadmin
+                </span>
+            </span>
+        </Link>
+    );
+}
+
+function AdminNav({ currentPath }: { currentPath: string }) {
+    return (
+        <>
+            {adminNavGroups.map((group) => (
+                <AdminSidebarGroup
+                    key={group.title}
+                    title={group.title}
+                    icon={group.icon}
+                    items={group.items}
+                    currentPath={currentPath}
+                    defaultExpanded={group.defaultExpanded}
+                    storageKey={group.storageKey}
+                />
+            ))}
+        </>
+    );
+}
+
+function BackToAppLink({ onClick }: { onClick?: () => void }) {
+    return (
+        <Link
+            href="/dashboard"
+            onClick={onClick}
+            className="flex min-h-10 items-center gap-2.5 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+            <ArrowLeft className="size-4" />
+            Back to App
+        </Link>
     );
 }
 
@@ -504,55 +571,54 @@ function MobileAdminDrawer({
     isOpen: boolean;
     onClose: () => void;
 }) {
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+                className="fixed inset-0 z-40 bg-ink/50 backdrop-blur-[2px] lg:hidden"
                 onClick={onClose}
             />
             {/* Drawer */}
-            <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar lg:hidden">
-                <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
-                    <div className="flex items-center gap-2">
-                        <div className="flex size-7 items-center justify-center rounded-md bg-red-600 text-xs font-bold text-white">
-                            A
-                        </div>
-                        <span className="text-sm font-semibold text-sidebar-foreground">
-                            Admin Panel
-                        </span>
-                    </div>
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Admin navigation"
+                className="fixed inset-y-0 left-0 z-50 flex w-[284px] animate-in flex-col bg-sidebar text-sidebar-foreground shadow-2xl duration-200 slide-in-from-left lg:hidden"
+            >
+                <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
+                    <AdminBrand />
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="rounded p-1 hover:bg-sidebar-accent"
+                        aria-label="Close navigation"
+                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     >
-                        <X className="size-5 text-sidebar-foreground" />
+                        <X className="size-5" />
                     </button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-3">
-                    {adminNavGroups.map((group) => (
-                        <AdminSidebarGroup
-                            key={group.title}
-                            title={group.title}
-                            icon={group.icon}
-                            items={group.items}
-                            currentPath={currentPath}
-                            defaultExpanded={group.defaultExpanded}
-                            storageKey={group.storageKey}
-                        />
-                    ))}
+                <div className="pt-3">
+                    <AdminSearchBar />
                 </div>
+                <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-2">
+                    <AdminNav currentPath={currentPath} />
+                </nav>
                 <div className="border-t border-sidebar-border p-3">
-                    <Link
-                        href="/dashboard"
-                        onClick={onClose}
-                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                    >
-                        <ArrowLeft className="size-4" />
-                        Back to App
-                    </Link>
+                    <BackToAppLink onClick={onClose} />
                 </div>
             </div>
         </>
@@ -561,7 +627,6 @@ function MobileAdminDrawer({
 
 // Breadcrumb component
 function AdminBreadcrumb({ currentPath }: { currentPath: string }) {
-    // Find the current group and item
     let currentGroup = '';
     let currentItem = '';
 
@@ -577,24 +642,29 @@ function AdminBreadcrumb({ currentPath }: { currentPath: string }) {
         }
     }
 
-    if (!currentItem) return null;
-
     return (
-        <nav className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <nav
+            aria-label="Breadcrumb"
+            className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground"
+        >
             <Link
                 href="/admin/dashboard"
                 className="transition-colors hover:text-foreground"
             >
                 Admin
             </Link>
-            <ChevronRight className="size-4" />
-            <span className="text-foreground">{currentGroup}</span>
-            {currentItem !== currentGroup && (
+            {currentItem && (
                 <>
-                    <ChevronRight className="size-4" />
-                    <span className="font-medium text-foreground">
-                        {currentItem}
-                    </span>
+                    <ChevronRight className="size-3.5 shrink-0" />
+                    <span className="truncate">{currentGroup}</span>
+                    {currentItem !== currentGroup && (
+                        <>
+                            <ChevronRight className="size-3.5 shrink-0" />
+                            <span className="truncate font-semibold text-foreground">
+                                {currentItem}
+                            </span>
+                        </>
+                    )}
                 </>
             )}
         </nav>
@@ -608,43 +678,22 @@ export default function AdminLayout({ children }: PropsWithChildren) {
 
     return (
         <FeatureProvider>
-            <div className="flex min-h-screen">
+            <div className="flex min-h-screen bg-background">
                 {/* Desktop Sidebar */}
-                <aside className="hidden w-64 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex">
-                    <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-6">
-                        <div className="flex size-7 items-center justify-center rounded-md bg-red-600 text-xs font-bold text-white">
-                            A
-                        </div>
-                        <span className="text-sm font-semibold">
-                            Admin Panel
-                        </span>
+                <aside className="sticky top-0 hidden h-svh w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
+                    <div className="flex h-16 items-center px-5">
+                        <AdminBrand />
                     </div>
 
                     <AdminSearchBar />
 
-                    <nav className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
-                        {adminNavGroups.map((group) => (
-                            <AdminSidebarGroup
-                                key={group.title}
-                                title={group.title}
-                                icon={group.icon}
-                                items={group.items}
-                                currentPath={currentPath}
-                                defaultExpanded={group.defaultExpanded}
-                                storageKey={group.storageKey}
-                            />
-                        ))}
+                    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-2">
+                        <AdminNav currentPath={currentPath} />
                     </nav>
 
                     <div className="flex flex-col gap-2 border-t border-sidebar-border p-3">
                         <AdminQuickStatsWidget />
-                        <Link
-                            href="/dashboard"
-                            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                        >
-                            <ArrowLeft className="size-4" />
-                            Back to App
-                        </Link>
+                        <BackToAppLink />
                     </div>
                 </aside>
 
@@ -659,25 +708,35 @@ export default function AdminLayout({ children }: PropsWithChildren) {
                 <div className="flex min-w-0 flex-1 flex-col">
                     <ImpersonationBanner />
 
-                    {/* Mobile Header */}
-                    <header className="flex h-14 items-center gap-4 border-b px-4 lg:hidden">
+                    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md lg:px-8">
                         <button
+                            type="button"
                             onClick={() => setMobileDrawerOpen(true)}
-                            className="rounded-md p-2 hover:bg-accent"
+                            aria-label="Open navigation"
+                            className="flex size-10 items-center justify-center rounded-lg hover:bg-accent lg:hidden"
                         >
                             <Menu className="size-5" />
                         </button>
-                        <div className="flex size-7 items-center justify-center rounded-md bg-red-600 text-xs font-bold text-white">
-                            A
+                        <div className="lg:hidden">
+                            <AdminBrand />
                         </div>
-                        <span className="text-sm font-semibold">
-                            Admin Panel
-                        </span>
+                        <div className="hidden min-w-0 flex-1 lg:block">
+                            <AdminBreadcrumb currentPath={currentPath} />
+                        </div>
+                        <div className="ml-auto flex items-center gap-1.5">
+                            <AppearanceToggleDropdown />
+                            <Link
+                                href="/dashboard"
+                                className="hidden min-h-9 items-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium transition-colors hover:border-primary sm:flex"
+                            >
+                                <ArrowLeft className="size-4" />
+                                Back to App
+                            </Link>
+                        </div>
                     </header>
 
-                    <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-                        <div className="mx-auto max-w-7xl">
-                            <AdminBreadcrumb currentPath={currentPath} />
+                    <main className="flex-1">
+                        <div className="mx-auto flex w-full max-w-[1240px] animate-rise flex-col px-4 pt-7 pb-12 lg:px-8">
                             {children}
                         </div>
                     </main>

@@ -156,10 +156,10 @@ export default function BroadcastsIndex({ broadcasts }: Props) {
         <AdminLayout>
             <Head title="Broadcast Notifications" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             Broadcast Notifications
                         </h1>
                         <p className="text-muted-foreground">
@@ -350,7 +350,7 @@ export default function BroadcastsIndex({ broadcasts }: Props) {
                     </Dialog>
                 </div>
 
-                <div className="rounded-md border">
+                <div className="overflow-hidden rounded-2xl border bg-card">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -388,7 +388,7 @@ export default function BroadcastsIndex({ broadcasts }: Props) {
                                         <TableCell>
                                             <div className="flex gap-1">
                                                 {broadcast.send_via_in_app && (
-                                                    <span className="inline-flex items-center space-x-1 rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                    <span className="inline-flex items-center space-x-1 rounded-md bg-accent px-2 py-1 text-xs font-medium text-accent-foreground">
                                                         <span>In-App</span>
                                                     </span>
                                                 )}

@@ -54,10 +54,10 @@ export default function MailTemplatesIndex({ templates }: IndexProps) {
         <AdminLayout>
             <Head title={t('admin.mail_templates.title', 'Email Templates')} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             {t('admin.mail_templates.title', 'Email Templates')}
                         </h1>
                         <p className="text-muted-foreground">
@@ -97,7 +97,7 @@ export default function MailTemplatesIndex({ templates }: IndexProps) {
                                 </p>
                             </div>
                         ) : (
-                            <div className="rounded-md border">
+                            <div className="overflow-hidden rounded-2xl border bg-card">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>

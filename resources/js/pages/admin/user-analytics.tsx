@@ -71,7 +71,7 @@ export default function UserAnalytics({
     };
 
     const deviceColors: Record<string, string> = {
-        iOS: 'bg-blue-500',
+        iOS: 'bg-primary',
         Android: 'bg-green-500',
         Windows: 'bg-indigo-500',
         macOS: 'bg-slate-500',
@@ -82,12 +82,12 @@ export default function UserAnalytics({
     return (
         <AdminLayout>
             <Head title="User Analytics" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <BarChart3 className="h-6 w-6" />
                         User Analytics
-                    </h2>
+                    </h1>
                     <p className="text-sm text-muted-foreground">
                         Monitor user growth, engagement, and retention across
                         the platform.
@@ -137,7 +137,7 @@ export default function UserAnalytics({
                                         {activeUsers.week}
                                     </p>
                                 </div>
-                                <TrendingUp className="h-8 w-8 text-blue-500/30" />
+                                <TrendingUp className="h-8 w-8 text-primary/30" />
                             </div>
                         </CardContent>
                     </Card>
@@ -275,7 +275,7 @@ export default function UserAnalytics({
                                         label: 'Last 7 Days',
                                         value: activeUsers.week,
                                         max: totalUsers,
-                                        color: 'bg-blue-500',
+                                        color: 'bg-primary',
                                     },
                                     {
                                         label: 'Last 30 Days',

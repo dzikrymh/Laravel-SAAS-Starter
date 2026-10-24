@@ -50,7 +50,7 @@ const STATUS_CONFIG: Record<
     },
     maintenance: {
         label: 'Maintenance',
-        color: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+        color: 'bg-accent text-accent-foreground',
         icon: Clock,
     },
 };
@@ -178,13 +178,13 @@ export default function AdminStatusPage({
     return (
         <AdminLayout>
             <Head title="Status Page" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <Activity className="h-6 w-6" />
                             Status Page
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             Manage system incidents displayed on the public
                             status page.

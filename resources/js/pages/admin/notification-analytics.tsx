@@ -71,12 +71,12 @@ export default function NotificationAnalytics({
     return (
         <AdminLayout>
             <Head title="Notification Analytics" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <Bell className="h-6 w-6" />
                         Notification Analytics
-                    </h2>
+                    </h1>
                     <p className="text-sm text-muted-foreground">
                         Track per-channel delivery counts and monitor
                         notification preference impact over the last 30 days.
@@ -115,7 +115,7 @@ export default function NotificationAnalytics({
                                         {channelSplit.email}% of total
                                     </p>
                                 </div>
-                                <Mail className="h-8 w-8 text-blue-500/30" />
+                                <Mail className="h-8 w-8 text-primary/30" />
                             </div>
                         </CardContent>
                     </Card>
@@ -199,7 +199,7 @@ export default function NotificationAnalytics({
                                             }}
                                         >
                                             <div
-                                                className="w-full bg-blue-500"
+                                                className="w-full bg-primary"
                                                 style={{
                                                     height: `${emailPercent}%`,
                                                 }}
@@ -218,7 +218,7 @@ export default function NotificationAnalytics({
                                                 <p className="font-medium">
                                                     {day.date}
                                                 </p>
-                                                <p className="text-blue-600 dark:text-blue-400">
+                                                <p className="text-highlight">
                                                     Email: {day.email}
                                                 </p>
                                                 <p className="text-violet-600 dark:text-violet-400">
@@ -238,7 +238,7 @@ export default function NotificationAnalytics({
                         {/* Legend */}
                         <div className="mt-4 flex items-center gap-6 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1.5">
-                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-500" />
+                                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
                                 Email
                             </span>
                             <span className="flex items-center gap-1.5">
@@ -267,7 +267,7 @@ export default function NotificationAnalytics({
                                 {/* Visual bar */}
                                 <div className="flex h-6 w-full overflow-hidden rounded-full">
                                     <div
-                                        className="bg-blue-500 transition-all"
+                                        className="bg-primary transition-all"
                                         style={{
                                             width: `${channelSplit.email}%`,
                                         }}
@@ -282,7 +282,7 @@ export default function NotificationAnalytics({
 
                                 <div className="flex justify-between text-sm">
                                     <span className="flex items-center gap-2">
-                                        <Mail className="h-4 w-4 text-blue-500" />
+                                        <Mail className="h-4 w-4 text-highlight" />
                                         Email:{' '}
                                         <strong>{channelSplit.email}%</strong>
                                     </span>
@@ -328,7 +328,7 @@ export default function NotificationAnalytics({
                                                 </div>
                                                 <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
                                                     <div
-                                                        className="bg-blue-500 transition-all"
+                                                        className="bg-primary transition-all"
                                                         style={{
                                                             width: `${(cat.email / maxCatTotal) * 100}%`,
                                                         }}
@@ -395,7 +395,7 @@ export default function NotificationAnalytics({
                                                 </td>
                                                 <td className="py-2.5 pr-4 text-right tabular-nums">
                                                     <span className="inline-flex items-center gap-1.5">
-                                                        <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+                                                        <span className="inline-block h-2 w-2 rounded-full bg-primary" />
                                                         {item.email}
                                                     </span>
                                                 </td>

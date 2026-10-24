@@ -114,9 +114,9 @@ export default function ImpersonationLogs({
             <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             Impersonation Logs
-                        </h2>
+                        </h1>
                         <p className="text-muted-foreground">
                             Immutable audit trail of super-admins impersonating
                             users.

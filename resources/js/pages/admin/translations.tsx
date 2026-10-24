@@ -239,7 +239,7 @@ export default function Translations({
                             </div>
 
                             <div className="flex-1 overflow-auto p-6">
-                                <div className="rounded-md border bg-card">
+                                <div className="overflow-hidden rounded-2xl border bg-card">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>

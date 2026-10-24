@@ -67,54 +67,58 @@ export function AdminSidebarGroup({
     );
 
     return (
-        <div className="mb-2">
+        <div className="flex flex-col">
             <button
+                type="button"
                 onClick={() => setIsExpanded(!isOpen)}
+                aria-expanded={isOpen}
                 className={cn(
-                    'flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    isGroupActive
-                        ? 'bg-sidebar-accent/50 text-sidebar-foreground'
-                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/30 hover:text-sidebar-foreground',
+                    'flex min-h-9 w-full items-center justify-between rounded-lg px-2.5 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors hover:text-foreground',
+                    isGroupActive ? 'text-foreground' : 'text-muted-foreground',
                 )}
             >
-                <div className="flex items-center gap-3">
-                    <GroupIcon className="size-4" />
-                    <span>{title}</span>
-                </div>
+                <span className="flex items-center gap-2">
+                    <GroupIcon className="size-3.5" />
+                    {title}
+                </span>
                 <ChevronDown
                     className={cn(
-                        'size-4 transition-transform duration-200',
+                        'size-3.5 transition-transform duration-200',
                         isOpen ? 'rotate-0' : '-rotate-90',
                     )}
                 />
             </button>
-
             <div
                 className={cn(
-                    'overflow-hidden transition-all duration-200 ease-in-out',
-                    isOpen ? 'mt-1 max-h-96 opacity-100' : 'max-h-0 opacity-0',
+                    'grid transition-[grid-template-rows,opacity] duration-200 ease-in-out',
+                    isOpen
+                        ? 'grid-rows-[1fr] opacity-100'
+                        : 'grid-rows-[0fr] opacity-0',
                 )}
             >
-                <div className="ml-3 flex flex-col gap-0.5 border-l border-sidebar-border/50 pl-4">
+                <div className="flex flex-col gap-0.5 overflow-hidden pb-2">
                     {visibleItems.map((item) => {
                         const isActive =
                             currentPath === item.href ||
                             currentPath.startsWith(item.href + '/');
+
                         return (
                             <a
                                 key={item.href}
                                 href={item.href}
+                                aria-current={isActive ? 'page' : undefined}
+                                tabIndex={isOpen ? undefined : -1}
                                 className={cn(
-                                    'flex items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors',
+                                    'flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors',
                                     isActive
-                                        ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
-                                        : 'text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+                                        ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
+                                        : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                                 )}
                             >
                                 {item.icon && (
-                                    <item.icon className="size-3.5" />
+                                    <item.icon className="size-4 shrink-0" />
                                 )}
-                                <span>{item.title}</span>
+                                <span className="truncate">{item.title}</span>
                             </a>
                         );
                     })}

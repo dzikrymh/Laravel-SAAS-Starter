@@ -55,7 +55,7 @@ interface AuditLogsProps {
 const EVENT_COLORS: Record<string, string> = {
     created:
         'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    updated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    updated: 'bg-accent text-accent-foreground',
     deleted: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
 
@@ -133,13 +133,13 @@ export default function AuditLogs({
     return (
         <AdminLayout>
             <Head title="Audit Logs" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <ScrollText className="h-6 w-6" />
                             Audit Logs
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             {activities.total} activit
                             {activities.total !== 1 ? 'ies' : 'y'} recorded

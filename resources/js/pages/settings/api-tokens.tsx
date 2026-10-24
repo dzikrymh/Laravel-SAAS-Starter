@@ -115,7 +115,7 @@ export default function ApiTokens({ tokens }: { tokens: Token[] }) {
                                         message={errors.name}
                                     />
                                 </div>
-                                <Button disabled={processing} className="mt-1 h-12">
+                                <Button disabled={processing} className="mt-1">
                                     {t(
                                         'settings.api_tokens.create.button',
                                         'Create',

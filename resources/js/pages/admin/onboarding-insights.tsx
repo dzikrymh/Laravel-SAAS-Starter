@@ -54,7 +54,7 @@ const stepLabels: Record<string, string> = {
 
 const stepColors: Record<string, string> = {
     welcome: 'bg-emerald-500',
-    workspace: 'bg-blue-500',
+    workspace: 'bg-primary',
     plan: 'bg-violet-500',
 };
 
@@ -79,12 +79,12 @@ export default function OnboardingInsights({
     return (
         <AdminLayout>
             <Head title="Onboarding Insights" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <Compass className="h-6 w-6" />
                         Onboarding Insights
-                    </h2>
+                    </h1>
                     <p className="text-sm text-muted-foreground">
                         Understand where users drop off during onboarding and
                         monitor completion rates over the last 30 days.
@@ -136,7 +136,7 @@ export default function OnboardingInsights({
                                         {metrics.completion_rate}%
                                     </p>
                                 </div>
-                                <Users className="h-8 w-8 text-blue-500/30" />
+                                <Users className="h-8 w-8 text-primary/30" />
                             </div>
                         </CardContent>
                     </Card>

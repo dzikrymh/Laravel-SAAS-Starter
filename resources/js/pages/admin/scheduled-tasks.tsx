@@ -38,9 +38,9 @@ export default function ScheduledTasks({ tasks }: Props) {
         <AdminLayout>
             <Head title="Scheduled Tasks" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
+            <div className="flex flex-1 flex-col gap-6">
                 <div>
-                    <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <Clock className="h-6 w-6" />
                         Scheduled Tasks
                     </h1>

@@ -98,7 +98,7 @@ class OnboardingInsightsController extends Controller
         // ── Average time to complete (onboarded users registered in last 30d) ──
         $avgMinutes = User::whereNotNull('onboarded_at')
             ->where('created_at', '>=', $thirtyDaysAgo)
-            ->selectRaw('AVG(CAST((julianday(onboarded_at) - julianday(created_at)) * 1440 AS INTEGER)) as avg_minutes')
+            ->selectRaw('AVG('.$this->minutesBetweenExpression('created_at', 'onboarded_at').') as avg_minutes')
             ->value('avg_minutes');
 
         $avgTimeMinutes = $avgMinutes !== null ? round((float) $avgMinutes, 1) : null;
@@ -114,5 +114,18 @@ class OnboardingInsightsController extends Controller
             'dropOff' => $dropOff,
             'dailyCompletions' => $dailyCompletions,
         ]);
+    }
+
+    /**
+     * Build a database-agnostic SQL expression for the whole minutes between two timestamp columns.
+     */
+    private function minutesBetweenExpression(string $startColumn, string $endColumn): string
+    {
+        return match ((new User)->getConnection()->getDriverName()) {
+            'pgsql' => "FLOOR(EXTRACT(EPOCH FROM ({$endColumn} - {$startColumn})) / 60)",
+            'mysql', 'mariadb' => "TIMESTAMPDIFF(MINUTE, {$startColumn}, {$endColumn})",
+            'sqlsrv' => "DATEDIFF(MINUTE, {$startColumn}, {$endColumn})",
+            default => "CAST(ROUND((julianday({$endColumn}) - julianday({$startColumn})) * 1440) AS INTEGER)",
+        };
     }
 }

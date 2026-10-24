@@ -139,3 +139,24 @@ it('logs welcome step when onboarding page is visited', function () {
 
     expect(OnboardingStepLog::where('step', 'welcome')->where('action', 'viewed')->count())->toBe(1);
 });
+
+it('calculates the average onboarding time in minutes', function () {
+    User::factory()->create([
+        'created_at' => now()->subDays(2),
+        'onboarded_at' => now()->subDays(2)->addMinutes(30),
+    ]);
+    User::factory()->create([
+        'created_at' => now()->subDays(2),
+        'onboarded_at' => now()->subDays(2)->addMinutes(90),
+    ]);
+
+    // Keep the admin itself out of the 30-day window.
+    $this->admin->forceFill(['created_at' => now()->subDays(60)])->save();
+
+    $this->actingAs($this->admin)
+        ->get('/admin/onboarding-insights')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('metrics.avg_time_minutes', fn ($minutes) => (float) $minutes === 60.0)
+        );
+});

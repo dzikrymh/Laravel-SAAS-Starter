@@ -56,13 +56,13 @@ export default function AdminMaintenance({ maintenance, isDown }: Props) {
     return (
         <AdminLayout>
             <Head title="Maintenance Mode" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <Shield className="h-6 w-6 text-primary" />
                             Maintenance Mode
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             Control application availability for end users
                         </p>
@@ -85,7 +85,7 @@ export default function AdminMaintenance({ maintenance, isDown }: Props) {
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">
+                        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-accent p-4 text-sm text-accent-foreground">
                             <Shield className="h-5 w-5 shrink-0" />
                             <p>
                                 <strong>Superadmins:</strong> You can always

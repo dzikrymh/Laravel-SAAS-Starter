@@ -78,9 +78,9 @@ export default function WorkspaceActivityHeatmap({
     return (
         <AdminLayout>
             <Head title="Activity Heatmap" />
-            <div className="space-y-6 p-6">
+            <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">
+                    <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         API Activity Heatmap
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">

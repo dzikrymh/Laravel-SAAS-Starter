@@ -76,7 +76,7 @@ interface AdminDashboardProps {
 
 function Sparkline({
     data,
-    color = '#1d4aff',
+    color = 'var(--primary)',
 }: {
     data: number[];
     color?: string;
@@ -143,7 +143,24 @@ function GrowthBadge({
     );
 }
 
-const COLORS = ['#1d4aff', '#cd68d4', '#2ab7a9', '#6aa84f'];
+const COLORS = [
+    'var(--chart-1)',
+    'var(--chart-2)',
+    'var(--chart-3)',
+    'var(--chart-4)',
+];
+
+const tooltipStyle = {
+    backgroundColor: 'var(--popover)',
+    border: '1px solid var(--border)',
+    borderRadius: '12px',
+    boxShadow: '0 18px 36px -22px rgb(15 23 41 / 0.45)',
+};
+const tooltipLabelStyle = { color: 'var(--muted-foreground)' };
+const tooltipItemStyle = { color: 'var(--popover-foreground)' };
+
+const statIconClassName =
+    'flex size-9 items-center justify-center rounded-[10px] bg-accent text-accent-foreground';
 
 export default function AdminDashboard({
     metrics,
@@ -188,27 +205,45 @@ export default function AdminDashboard({
     return (
         <AdminLayout>
             <Head title="Admin Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">
-                        System Overview
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                        Monitor platform metrics across all workspaces.
-                    </p>
+            <div className="flex flex-1 flex-col gap-6">
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
+                            System Overview
+                        </h1>
+                        <p className="text-[15px] text-muted-foreground">
+                            Monitor platform metrics across all workspaces.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" asChild>
+                            <Link href="/admin/system-health">
+                                <Activity />
+                                System Health
+                            </Link>
+                        </Button>
+                        <Button asChild>
+                            <Link href="/admin/users">
+                                <Users />
+                                Manage Users
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Top Metric Cards */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                    <Card className="gap-3 transition-[translate,border-color,box-shadow] duration-300 hover:-translate-y-[3px] hover:border-primary hover:shadow-[0_18px_36px_-22px_rgb(15_23_41/0.45)]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-[13px] font-medium text-muted-foreground">
                                 Monthly Recurring Revenue
                             </CardTitle>
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            <span className={statIconClassName}>
+                                <DollarSign className="size-4" />
+                            </span>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-[28px] font-extrabold tracking-[-0.02em] tabular-nums">
                                 {formatCurrency(metrics.mrr)}
                             </div>
                             <div className="mt-2 flex items-center justify-between">
@@ -222,15 +257,17 @@ export default function AdminDashboard({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                    <Card className="gap-3 transition-[translate,border-color,box-shadow] duration-300 hover:-translate-y-[3px] hover:border-primary hover:shadow-[0_18px_36px_-22px_rgb(15_23_41/0.45)]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-[13px] font-medium text-muted-foreground">
                                 Active Subscriptions
                             </CardTitle>
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            <span className={statIconClassName}>
+                                <CreditCard className="size-4" />
+                            </span>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-[28px] font-extrabold tracking-[-0.02em] tabular-nums">
                                 {metrics.active_subscriptions}
                             </div>
                             <div className="mt-2 flex items-center justify-between">
@@ -244,15 +281,17 @@ export default function AdminDashboard({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                    <Card className="gap-3 transition-[translate,border-color,box-shadow] duration-300 hover:-translate-y-[3px] hover:border-primary hover:shadow-[0_18px_36px_-22px_rgb(15_23_41/0.45)]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-[13px] font-medium text-muted-foreground">
                                 Active Workspaces (7d)
                             </CardTitle>
-                            <Activity className="h-4 w-4 text-muted-foreground" />
+                            <span className={statIconClassName}>
+                                <Activity className="size-4" />
+                            </span>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-[28px] font-extrabold tracking-[-0.02em] tabular-nums">
                                 {metrics.total_workspaces}
                             </div>
                             <div className="mt-2 flex items-center justify-between">
@@ -267,15 +306,17 @@ export default function AdminDashboard({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                    <Card className="gap-3 transition-[translate,border-color,box-shadow] duration-300 hover:-translate-y-[3px] hover:border-primary hover:shadow-[0_18px_36px_-22px_rgb(15_23_41/0.45)]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-[13px] font-medium text-muted-foreground">
                                 Total Users
                             </CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span className={statIconClassName}>
+                                <Users className="size-4" />
+                            </span>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-[28px] font-extrabold tracking-[-0.02em] tabular-nums">
                                 {metrics.total_users}
                             </div>
                             <div className="mt-2 flex items-center justify-between">
@@ -290,15 +331,17 @@ export default function AdminDashboard({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                    <Card className="gap-3 transition-[translate,border-color,box-shadow] duration-300 hover:-translate-y-[3px] hover:border-primary hover:shadow-[0_18px_36px_-22px_rgb(15_23_41/0.45)]">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-[13px] font-medium text-muted-foreground">
                                 Avg. First Response
                             </CardTitle>
-                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span className={statIconClassName}>
+                                <Clock className="size-4" />
+                            </span>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-[28px] font-extrabold tracking-[-0.02em] tabular-nums">
                                 {formatDuration(
                                     metrics.avg_first_response_seconds,
                                 )}
@@ -317,7 +360,9 @@ export default function AdminDashboard({
                     {/* Growth Chart */}
                     <Card className="md:col-span-4">
                         <CardHeader>
-                            <CardTitle>Platform Growth</CardTitle>
+                            <CardTitle className="text-[17px]">
+                                Platform Growth
+                            </CardTitle>
                             <CardDescription>
                                 Daily new users and workspaces over the last 14
                                 days
@@ -345,12 +390,12 @@ export default function AdminDashboard({
                                             >
                                                 <stop
                                                     offset="5%"
-                                                    stopColor="#1d4aff"
+                                                    stopColor="var(--chart-1)"
                                                     stopOpacity={0.3}
                                                 />
                                                 <stop
                                                     offset="95%"
-                                                    stopColor="#1d4aff"
+                                                    stopColor="var(--chart-1)"
                                                     stopOpacity={0}
                                                 />
                                             </linearGradient>
@@ -363,26 +408,26 @@ export default function AdminDashboard({
                                             >
                                                 <stop
                                                     offset="5%"
-                                                    stopColor="#cd68d4"
+                                                    stopColor="var(--chart-2)"
                                                     stopOpacity={0.3}
                                                 />
                                                 <stop
                                                     offset="95%"
-                                                    stopColor="#cd68d4"
+                                                    stopColor="var(--chart-2)"
                                                     stopOpacity={0}
                                                 />
                                             </linearGradient>
                                         </defs>
                                         <XAxis
                                             dataKey="date"
-                                            stroke="#9ca3af"
+                                            stroke="var(--muted-foreground)"
                                             fontSize={12}
                                             tickLine={false}
                                             axisLine={false}
                                             dy={10}
                                         />
                                         <YAxis
-                                            stroke="#9ca3af"
+                                            stroke="var(--muted-foreground)"
                                             fontSize={12}
                                             tickLine={false}
                                             axisLine={false}
@@ -393,19 +438,13 @@ export default function AdminDashboard({
                                         <CartesianGrid
                                             strokeDasharray="3 3"
                                             vertical={false}
-                                            stroke="#e5e7eb"
+                                            stroke="var(--border)"
                                             strokeOpacity={0.5}
                                         />
                                         <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#1d1d1d',
-                                                borderColor: '#404040',
-                                                borderRadius: '4px',
-                                                border: '1px solid #404040',
-                                            }}
-                                            itemStyle={{
-                                                color: '#f5f5f5',
-                                            }}
+                                            contentStyle={tooltipStyle}
+                                            labelStyle={tooltipLabelStyle}
+                                            itemStyle={tooltipItemStyle}
                                         />
                                         <Legend
                                             wrapperStyle={{
@@ -416,7 +455,7 @@ export default function AdminDashboard({
                                             type="monotone"
                                             dataKey="users"
                                             name="New Users"
-                                            stroke="#1d4aff"
+                                            stroke="var(--chart-1)"
                                             strokeWidth={2}
                                             fillOpacity={1}
                                             fill="url(#colorUsers)"
@@ -425,7 +464,7 @@ export default function AdminDashboard({
                                             type="monotone"
                                             dataKey="workspaces"
                                             name="New Workspaces"
-                                            stroke="#cd68d4"
+                                            stroke="var(--chart-2)"
                                             strokeWidth={2}
                                             fillOpacity={1}
                                             fill="url(#colorWorkspaces)"
@@ -439,7 +478,9 @@ export default function AdminDashboard({
                     {/* Plan Distribution */}
                     <Card className="md:col-span-3">
                         <CardHeader>
-                            <CardTitle>Plan Distribution</CardTitle>
+                            <CardTitle className="text-[17px]">
+                                Plan Distribution
+                            </CardTitle>
                             <CardDescription>
                                 Active workspace subscriptions across pricing
                                 tiers
@@ -474,15 +515,9 @@ export default function AdminDashboard({
                                             )}
                                         </Pie>
                                         <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#1d1d1d',
-                                                borderColor: '#404040',
-                                                borderRadius: '4px',
-                                                border: '1px solid #404040',
-                                            }}
-                                            itemStyle={{
-                                                color: '#f5f5f5',
-                                            }}
+                                            contentStyle={tooltipStyle}
+                                            labelStyle={tooltipLabelStyle}
+                                            itemStyle={tooltipItemStyle}
                                             formatter={
                                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 (value: any) => [
@@ -505,16 +540,14 @@ export default function AdminDashboard({
                 {/* Recent Users */}
                 <div>
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-lg font-semibold tracking-tight">
-                            Recent Users
-                        </h3>
+                        <h3 className="text-[17px] font-bold">Recent Users</h3>
                         <Button variant="outline" size="sm" asChild>
                             <Link href="/admin/users">View All Users →</Link>
                         </Button>
                     </div>
-                    <div className="overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-muted/50 text-xs text-muted-foreground uppercase">
+                    <div className="overflow-x-auto rounded-2xl border bg-card text-card-foreground">
+                        <table className="w-full min-w-[560px] text-left text-sm">
+                            <thead className="border-b text-xs font-semibold tracking-[0.04em] text-muted-foreground">
                                 <tr>
                                     <th className="px-6 py-3 font-medium">
                                         Name
@@ -546,8 +579,23 @@ export default function AdminDashboard({
                                             key={user.id}
                                             className="transition-colors hover:bg-muted/50"
                                         >
-                                            <td className="px-6 py-4 font-medium">
-                                                {user.name}
+                                            <td className="px-6 py-3.5">
+                                                <span className="flex items-center gap-3">
+                                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+                                                        {user.name
+                                                            .split(' ')
+                                                            .map(
+                                                                (part) =>
+                                                                    part[0],
+                                                            )
+                                                            .join('')
+                                                            .slice(0, 2)
+                                                            .toUpperCase()}
+                                                    </span>
+                                                    <span className="font-semibold">
+                                                        {user.name}
+                                                    </span>
+                                                </span>
                                             </td>
                                             <td className="px-6 py-4 text-muted-foreground">
                                                 {user.email}

@@ -50,13 +50,13 @@ export default function AdminTicketShow({ ticket }: ShowProps) {
     const getStatusColor = (status: TicketData['status']) => {
         switch (status) {
             case 'open':
-                return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+                return 'bg-accent text-accent-foreground';
             case 'in_progress':
                 return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300';
             case 'resolved':
                 return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
             case 'closed':
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+                return 'bg-muted text-muted-foreground';
         }
     };
 
@@ -96,9 +96,9 @@ export default function AdminTicketShow({ ticket }: ShowProps) {
                 <div className="flex flex-col gap-6 border-b pb-6 md:flex-row md:items-start md:justify-between">
                     <div className="flex-1">
                         <div className="flex items-center gap-3">
-                            <h2 className="text-2xl font-bold tracking-tight">
+                            <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                                 {ticket.subject}
-                            </h2>
+                            </h1>
                             <Badge
                                 variant="secondary"
                                 className={getStatusColor(ticket.status)}

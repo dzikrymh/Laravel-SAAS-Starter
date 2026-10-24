@@ -71,7 +71,7 @@ const TYPE_CONFIG = {
     general: {
         label: 'General',
         icon: MessageCircle,
-        color: 'text-blue-500',
+        color: 'text-highlight',
         badge: 'outline' as const,
     },
     experience: {
@@ -85,8 +85,7 @@ const TYPE_CONFIG = {
 const STATUS_CONFIG = {
     new: {
         label: 'New',
-        className:
-            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        className: 'bg-accent text-accent-foreground',
     },
     reviewed: {
         label: 'Reviewed',
@@ -139,14 +138,14 @@ export default function AdminFeedback({ feedback, filters, counts }: Props) {
     return (
         <AdminLayout>
             <Head title="User Feedback" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                        <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             <MessageCircle className="h-6 w-6" />
                             User Feedback
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             {feedback.total} submission
                             {feedback.total !== 1 ? 's' : ''} from users

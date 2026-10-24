@@ -54,7 +54,7 @@ export default function AdminUserShow({
         <AdminLayout>
             <Head title={`User: ${user.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" asChild>
                         <Link href="/admin/users">
@@ -63,9 +63,9 @@ export default function AdminUserShow({
                         </Link>
                     </Button>
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             {user.name}
-                        </h2>
+                        </h1>
                         <p className="text-sm text-muted-foreground">
                             {user.email}
                         </p>

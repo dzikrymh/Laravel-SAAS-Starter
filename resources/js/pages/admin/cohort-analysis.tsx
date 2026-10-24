@@ -54,12 +54,12 @@ export default function CohortAnalysis({ cohorts }: CohortAnalysisProps) {
     return (
         <AdminLayout>
             <Head title="Cohort Retention Analysis" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-md border border-sidebar-border/70 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div>
-                    <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <h1 className="flex items-center gap-2.5 text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                         <Grid3X3 className="h-6 w-6" />
                         Cohort Retention Analysis
-                    </h2>
+                    </h1>
                     <p className="text-sm text-muted-foreground">
                         Percentage of users from each signup month who returned
                         and logged in in subsequent months.

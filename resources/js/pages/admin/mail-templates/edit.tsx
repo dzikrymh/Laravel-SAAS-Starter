@@ -50,7 +50,7 @@ export default function MailTemplatesEdit({
         <AdminLayout>
             <Head title={`Edit ${mailTemplate.mailable_name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-1 flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <Button
@@ -64,7 +64,7 @@ export default function MailTemplatesEdit({
                             <ArrowLeft className="mr-1 h-4 w-4" />
                             Back to Templates
                         </Button>
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-[30px] leading-tight font-extrabold tracking-[-0.025em]">
                             Edit Template: {mailTemplate.mailable_name}
                         </h1>
                         <p className="mt-1 font-mono text-sm text-muted-foreground">
